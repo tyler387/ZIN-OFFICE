@@ -1,0 +1,10 @@
+export { default as HomeSubMenu } from './HomeSubMenu';
+export { default as ApprovalSubMenu } from './ApprovalSubMenu';
+export { default as MailSubMenu } from './MailSubMenu';
+export { default as AllDocsSubMenu } from './AllDocsSubMenu';
+export { default as DocMgrSubMenu } from './DocMgrSubMenu';
+export { default as DriveSubMenu } from './DriveSubMenu';
+export { default as ReportSubMenu } from './ReportSubMenu';
+export { default as AttendanceSubMenu } from './AttendanceSubMenu';
+export { default as BoardSubMenu } from './BoardSubMenu';
+export { default as DefaultSubMenu } from './DefaultSubMenu';
