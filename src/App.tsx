@@ -1,5 +1,5 @@
-import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import AppLayout from './layouts/AppLayout';
 import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
@@ -19,8 +19,55 @@ import MailDetailPage from './pages/MailDetailPage';
 import MessengerPage from './pages/MessengerPage';
 import CalendarPage from './pages/CalendarPage';
 import ReservePage from './pages/ReservePage';
+import CommunityPage from './pages/CommunityPage';
+import { authApi } from './api/authApi';
+import { useAuthStore } from './store/authStore';
+import { Spin } from 'antd';
 
 const App: React.FC = () => {
+  const setUser = useAuthStore((state) => state.setUser);
+  const [isInitializing, setIsInitializing] = useState(true);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const initAuth = async () => {
+      const token = localStorage.getItem('accessToken');
+      if (token) {
+        try {
+          const res = await authApi.getMe();
+          if (res.data.success) {
+            setUser(res.data.data);
+          }
+        } catch (error) {
+          console.error('Failed to restore session:', error);
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          setUser(null);
+          // Redirect to login if trying to access protected route
+          if (location.pathname !== '/login') {
+            navigate('/login');
+          }
+        }
+      } else {
+        if (location.pathname !== '/login') {
+          navigate('/login');
+        }
+      }
+      setIsInitializing(false);
+    };
+
+    initAuth();
+  }, [setUser, navigate]);
+
+  if (isInitializing) {
+    return (
+      <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Spin size="large" />
+      </div>
+    );
+  }
+
   return (
     <Routes>
       {/* Login - standalone page without AppLayout */}
@@ -54,6 +101,8 @@ const App: React.FC = () => {
         <Route path="calendar" element={<CalendarPage />} />
         <Route path="reserve" element={<Navigate to="/reserve/room" replace />} />
         <Route path="reserve/:type" element={<ReservePage />} />
+        <Route path="community" element={<CommunityPage />} />
+        <Route path="community/:communityId" element={<CommunityPage />} />
 
         {/* Catch-all redirect */}
         <Route path="*" element={<Navigate to="/home" replace />} />

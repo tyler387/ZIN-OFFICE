@@ -14,10 +14,11 @@ import AttendanceSubMenu from '../components/sidebar/AttendanceSubMenu';
 import BoardSubMenu from '../components/sidebar/BoardSubMenu';
 import CalendarSubMenu from '../components/sidebar/CalendarSubMenu';
 import ReserveSubMenu from '../components/sidebar/ReserveSubMenu';
+import CommunitySubMenu from '../components/sidebar/CommunitySubMenu';
 import DefaultSubMenu from '../components/sidebar/DefaultSubMenu';
 
 /* ─── 경로별 메뉴 컨텍스트 ─── */
-type MenuType = 'home' | 'approval' | 'mail' | 'alldocs' | 'docmgr' | 'drive' | 'report' | 'attendance' | 'board' | 'calendar' | 'reserve' | 'default';
+type MenuType = 'home' | 'approval' | 'mail' | 'alldocs' | 'docmgr' | 'drive' | 'report' | 'attendance' | 'board' | 'calendar' | 'reserve' | 'community' | 'default';
 
 interface MenuContext {
     title: string;
@@ -37,6 +38,7 @@ const getMenuContext = (path: string): MenuContext => {
     if (path.startsWith('/messenger')) return { title: '메신저', type: 'default' };
     if (path.startsWith('/calendar')) return { title: '캘린더', type: 'calendar' };
     if (path.startsWith('/reserve')) return { title: '예약', type: 'reserve' };
+    if (path.startsWith('/community')) return { title: '커뮤니티', type: 'community' };
     return { title: '홈', type: 'home' };
 };
 
@@ -54,6 +56,7 @@ const renderContent = (ctx: MenuContext) => {
         case 'board': return <BoardSubMenu />;
         case 'calendar': return <CalendarSubMenu />;
         case 'reserve': return <ReserveSubMenu />;
+        case 'community': return <CommunitySubMenu />;
         case 'default': return <DefaultSubMenu title={ctx.title} />;
         default: return <DefaultSubMenu title={ctx.title} />;
     }

@@ -1,19 +1,37 @@
 import React from 'react';
-import { Input, Select, Badge, Avatar, Dropdown, type MenuProps } from 'antd';
+import { Input, Select, Badge, Avatar, Dropdown, type MenuProps, message } from 'antd';
 import {
     SearchOutlined,
     QuestionCircleOutlined,
     BellOutlined,
     UserOutlined,
 } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../store/authStore';
+import { authApi } from '../api/authApi';
 
 const TopHeader: React.FC = () => {
+    const navigate = useNavigate();
+    const { user, logout } = useAuthStore();
+
+    const handleLogout = async () => {
+        try {
+            await authApi.logout();
+            logout();
+            message.success('로그아웃 되었습니다.');
+            navigate('/login');
+        } catch (error) {
+            console.error('Logout failed:', error);
+            message.error('로그아웃 처리 중 오류가 발생했습니다.');
+        }
+    };
+
     const profileMenu: MenuProps = {
         items: [
-            { key: 'name', label: '홍길동', disabled: true, style: { fontWeight: 600, color: '#222' } },
-            { key: 'email', label: 'hong@company.com', disabled: true, style: { fontSize: 12, color: '#999' } },
+            { key: 'name', label: user?.name || '사용자', disabled: true, style: { fontWeight: 600, color: '#222' } },
+            { key: 'email', label: user?.email || '', disabled: true, style: { fontSize: 12, color: '#999' } },
             { type: 'divider' },
-            { key: 'logout', label: '로그아웃' },
+            { key: 'logout', label: '로그아웃', onClick: handleLogout },
         ],
     };
 

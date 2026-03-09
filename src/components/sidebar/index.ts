@@ -7,4 +7,5 @@ export { default as DriveSubMenu } from './DriveSubMenu';
 export { default as ReportSubMenu } from './ReportSubMenu';
 export { default as AttendanceSubMenu } from './AttendanceSubMenu';
 export { default as BoardSubMenu } from './BoardSubMenu';
+export { default as CommunitySubMenu } from './CommunitySubMenu';
 export { default as DefaultSubMenu } from './DefaultSubMenu';

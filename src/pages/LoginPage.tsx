@@ -1,8 +1,40 @@
-import React from 'react';
-import { Form, Input, Button, Card } from 'antd';
+import React, { useState } from 'react';
+import { Form, Input, Button, Card, message } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
+import { authApi } from '../api/authApi';
+import { useAuthStore } from '../store/authStore';
 
 const LoginPage: React.FC = () => {
+    const navigate = useNavigate();
+    const setUser = useAuthStore((state) => state.setUser);
+    const [loading, setLoading] = useState(false);
+
+    const onFinish = async (values: any) => {
+        try {
+            setLoading(true);
+            const res = await authApi.login(values.email, values.password);
+
+            if (res.data.success) {
+                const { accessToken, refreshToken, user } = res.data.data;
+                localStorage.setItem('accessToken', accessToken);
+                localStorage.setItem('refreshToken', refreshToken);
+                setUser(user);
+
+                message.success('로그인 성공!');
+                navigate('/home');
+            } else {
+                message.error(res.data.message || '로그인에 실패했습니다.');
+            }
+        } catch (error: any) {
+            console.error('Login error:', error);
+            const errorMsg = error.response?.data?.message || '로그인 중 오류가 발생했습니다.';
+            message.error(errorMsg);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div
             style={{
@@ -44,15 +76,21 @@ const LoginPage: React.FC = () => {
                     </p>
                 </div>
 
-                <Form layout="vertical" size="large">
-                    <Form.Item>
-                        <Input prefix={<UserOutlined />} placeholder="아이디" />
+                <Form layout="vertical" size="large" onFinish={onFinish}>
+                    <Form.Item
+                        name="email"
+                        rules={[{ required: true, message: '이메일을 입력해주세요.' }]}
+                    >
+                        <Input prefix={<UserOutlined />} placeholder="이메일 (ex: admin@company.com)" />
+                    </Form.Item>
+                    <Form.Item
+                        name="password"
+                        rules={[{ required: true, message: '비밀번호를 입력해주세요.' }]}
+                    >
+                        <Input.Password prefix={<LockOutlined />} placeholder="비밀번호 (ex: password123)" />
                     </Form.Item>
                     <Form.Item>
-                        <Input.Password prefix={<LockOutlined />} placeholder="비밀번호" />
-                    </Form.Item>
-                    <Form.Item>
-                        <Button type="primary" htmlType="submit" block style={{ height: 44, fontWeight: 600 }}>
+                        <Button type="primary" htmlType="submit" block loading={loading} style={{ height: 44, fontWeight: 600 }}>
                             로그인
                         </Button>
                     </Form.Item>
