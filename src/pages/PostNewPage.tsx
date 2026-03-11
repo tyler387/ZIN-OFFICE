@@ -1,10 +1,9 @@
 import React from 'react';
 import { Card, Form, Input, Button, Space } from 'antd';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const PostNewPage: React.FC = () => {
     const navigate = useNavigate();
-    const { boardId } = useParams();
 
     return (
         <div>

@@ -1,9 +1,8 @@
 import React from 'react';
 import { Card, Button, Divider } from 'antd';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const PostDetailPage: React.FC = () => {
-    const { postId } = useParams();
     const navigate = useNavigate();
 
     return (

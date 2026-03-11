@@ -116,9 +116,9 @@ public class DataInitializer implements ApplicationRunner {
                 // 1. Pending for Kim, Planned for Lee
                 ApprovalDocument doc1 = ApprovalDocument.builder()
                         .docNo("AP-2026-101")
-                        .formType("기안서")
-                        .title("신규 프로젝트 제안")
-                        .content("프로젝트 제안서입니다.")
+                        .formType("휴가신청서")
+                        .title("휴가 신청서 (연차)")
+                        .content("2026-03-12 ~ 2026-03-13 연차 휴가 신청합니다.")
                         .status(ApprovalStatus.PENDING)
                         .submitter(hong)
                         .department(hong.getDepartment())
@@ -136,8 +136,8 @@ public class DataInitializer implements ApplicationRunner {
                 ApprovalDocument doc2 = ApprovalDocument.builder()
                         .docNo("AP-2026-102")
                         .formType("지출결의서")
-                        .title("팀 회식비 지출결의")
-                        .content("회식비 지출결의서입니다.")
+                        .title("3월 부서 비품 구매 결의서")
+                        .content("토너 및 A4 용지 구매 건입니다.")
                         .status(ApprovalStatus.PENDING)
                         .submitter(hong)
                         .department(hong.getDepartment())
@@ -154,9 +154,9 @@ public class DataInitializer implements ApplicationRunner {
                 // 3. Reference for Kim & Lee
                 ApprovalDocument doc3 = ApprovalDocument.builder()
                         .docNo("AP-2026-103")
-                        .formType("협조전")
-                        .title("서버 점검 사전 안내")
-                        .content("서버 점검이 있을 예정입니다.")
+                        .formType("출장신청서")
+                        .title("외근 및 출장 신청서 (부산)")
+                        .content("금주 목요일~금요일 부산 지사 출장 신청의 건입니다.")
                         .status(ApprovalStatus.PENDING)
                         .submitter(hong)
                         .department(hong.getDepartment())
@@ -173,12 +173,27 @@ public class DataInitializer implements ApplicationRunner {
                 // 추가 더미 데이터 생성
 
                 // 4. Multiple Pending/Planned/Reference Combo
+                String[] realisticTitles = {
+                        "오피스 라이선스 갱신 품의",
+                        "고객사 미팅 결과 보고서",
+                        "신입사원 PC 구매 요청",
+                        "4월 마케팅 예산 편성안",
+                        "재택근무 신청서 (금주 금요일)",
+                        "서버 증설 관련 지출결의",
+                        "보안 검수 결과 보고",
+                        "전사 타운홀 미팅 안내",
+                        "법인차량 사용 신청서",
+                        "외주 계약서 검토 요청"
+                };
+                String[] realisticFormTypes = { "품의서", "보고서", "지출결의서", "기안서", "신청서", "지출결의서", "보고서", "협조전", "신청서", "기안서" };
+
                 for (int i = 104; i <= 113; i++) {
+                    int index = i - 104;
                     ApprovalDocument extraDoc = ApprovalDocument.builder()
                             .docNo("AP-2026-" + i)
-                            .formType(i % 2 == 0 ? "기안서" : "협조전")
-                            .title("추가 테스트 문서 - " + i + "번")
-                            .content("결재 대기/예정/참조 추가 테스트 데이터입니다.")
+                            .formType(realisticFormTypes[index])
+                            .title(realisticTitles[index])
+                            .content(realisticTitles[index] + "에 대한 상세 내용입니다.")
                             .status(ApprovalStatus.PENDING)
                             .submitter(hong)
                             .department(hong.getDepartment())
