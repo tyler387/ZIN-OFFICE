@@ -1,0 +1,172 @@
+﻿
+> Task :compileJava FAILED
+.\gradlew.bat : C:\dev\wo
+rkspace\test02\backend\sr
+c\main\java\com\groupware
+\service\ApprovalService.
+java:128: error: cannot f
+ind symbol
+위치 줄:1 문자:1
++ .\gradlew.bat compileJa
+va 2>&1 | Out-File -FileP
+ath error.txt -Encodi ...
++ ~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~
+    + CategoryInfo       
+       : NotSpecified:   
+  (C:\dev\workspac...n   
+ ot find symbol:Strin    
+g) [], RemoteExcepti    o
+n
+    + FullyQualifiedErro 
+   rId : NativeCommandE  
+  rror
+ 
+                .orElseTh
+row(() -> new CustomExcep
+tion(ErrorCode.FORBIDDEN,
+ "���� ���� ������ �ƴϰų� 
+������ �����ϴ�."));
+                         
+                         
+              ^
+  symbol:   variable FORB
+IDDEN
+  location: class ErrorCo
+de
+C:\dev\workspace\test02\b
+ackend\src\main\java\com\
+groupware\service\Approva
+lService.java:159: error:
+ cannot find symbol
+                .orElseTh
+row(() -> new CustomExcep
+tion(ErrorCode.FORBIDDEN,
+ "���� ���� ������ �ƴϰų� 
+������ �����ϴ�."));
+                         
+                         
+              ^
+  symbol:   variable FORB
+IDDEN
+  location: class ErrorCo
+de
+C:\dev\workspace\test02\b
+ackend\src\main\java\com\
+groupware\service\Approva
+lService.java:173: error:
+ cannot find symbol
+            throw new Cus
+tomException(ErrorCode.FO
+RBIDDEN, "�ڽ��� ����� ���
+��� ����� �� �ֽ��ϴ�.");
+                         
+                      ^
+  symbol:   variable FORB
+IDDEN
+  location: class ErrorCo
+de
+C:\dev\workspace\test02\b
+ackend\src\main\java\com\
+groupware\service\Approva
+lService.java:189: error:
+ cannot find symbol
+            throw new Cus
+tomException(ErrorCode.FO
+RBIDDEN, "�ڽ��� ����� ���
+��� ������ �� �ֽ��ϴ�.");
+                         
+                      ^
+  symbol:   variable FORB
+IDDEN
+  location: class ErrorCo
+de
+4 errors
+
+[Incubating] Problems report is available at: file:///C:/dev/workspace/test02/backend/build/reports/problems/problems-report.html
+
+FAILURE: Build failed wit
+h an exception.
+
+* What went wrong:
+Execution failed for task
+ ':compileJava'.
+> Compilation failed; see
+ the compiler output belo
+w.
+  C:\dev\workspace\test02
+\backend\src\main\java\co
+m\groupware\service\Appro
+valService.java:128: erro
+r: cannot find symbol
+                  .orElse
+Throw(() -> new CustomExc
+eption(ErrorCode.FORBIDDE
+N, "���� ���� ������ �ƴϰų
+� ������ �����ϴ�."));
+                         
+                         
+                ^
+    symbol:   variable FO
+RBIDDEN
+    location: class Error
+Code
+  C:\dev\workspace\test02
+\backend\src\main\java\co
+m\groupware\service\Appro
+valService.java:159: erro
+r: cannot find symbol
+                  .orElse
+Throw(() -> new CustomExc
+eption(ErrorCode.FORBIDDE
+N, "���� ���� ������ �ƴϰų
+� ������ �����ϴ�."));
+                         
+                         
+                ^
+    symbol:   variable FO
+RBIDDEN
+    location: class Error
+Code
+  C:\dev\workspace\test02
+\backend\src\main\java\co
+m\groupware\service\Appro
+valService.java:173: erro
+r: cannot find symbol
+              throw new C
+ustomException(ErrorCode.
+FORBIDDEN, "�ڽ��� ����� �
+����� ����� �� �ֽ��ϴ�.");
+                         
+                        ^
+    symbol:   variable FO
+RBIDDEN
+    location: class Error
+Code
+  C:\dev\workspace\test02
+\backend\src\main\java\co
+m\groupware\service\Appro
+valService.java:189: erro
+r: cannot find symbol
+              throw new C
+ustomException(ErrorCode.
+FORBIDDEN, "�ڽ��� ����� �
+����� ������ �� �ֽ��ϴ�.")
+;
+                         
+                        ^
+    symbol:   variable FO
+RBIDDEN
+    location: class Error
+Code
+  4 errors
+
+* Try:
+> Check your code and dep
+endencies to fix the comp
+ilation error(s)
+> Run with --scan to get 
+full insights.
+
+BUILD FAILED in 1s
+1 actionable task: 1 executed

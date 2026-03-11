@@ -1,20 +1,19 @@
 import api from './index';
 
-/* ─── 문서관리 / 전사문서함 API ─── */
 export const docApi = {
-    /** 전사 문서함 목록 */
-    getAllDocs: (page = 1, size = 20, formType?: string) =>
+    /** 전사 문서함 전체 조회 */
+    getAllDocs: (page = 0, size = 20, formType = 'all') =>
         api.get('/docs/all', { params: { page, size, formType } }),
 
-    /** 문서관리 - 카테고리별 목록 */
-    getDocsByCategory: (category: string, page = 1) =>
-        api.get(`/docs/manage/${category}`, { params: { page } }),
+    /** 문서 관리 (recent, updated, pending-approval, pending-register) */
+    getManageDocs: (category: string, page = 0, size = 20) =>
+        api.get(`/docs/manage/${category}`, { params: { page, size } }),
 
-    /** 문서 등록 */
-    registerDoc: (data: { title: string; category: string; content: string }) =>
+    /** 단순 문서 등록 (결재 없이) */
+    createDoc: (data: { title: string; content: string; formType?: string }) =>
         api.post('/docs', data),
 
-    /** 문서 상세 */
+    /** 문서 읽기 및 상세 정보 조회 */
     getDocDetail: (id: string) =>
         api.get(`/docs/${id}`),
 };

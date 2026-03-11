@@ -39,6 +39,9 @@ public class User {
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Employee employee;
+
     @Builder
     public User(String email, String password, String name, Role role) {
         this.email = email;

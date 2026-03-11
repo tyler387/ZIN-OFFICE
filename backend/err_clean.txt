@@ -1,0 +1,8 @@
+C:\dev\workspace\test02\backend\src\main\java\com\groupware\service\ApprovalService.java:123: error: cannot find symbol
+C:\dev\workspace\test02\backend\src\main\java\com\groupware\service\ApprovalService.java:154: error: cannot find symbol
+C:\dev\workspace\test02\backend\src\main\java\com\groupware\service\ApprovalService.java:168: error: cannot find symbol
+C:\dev\workspace\test02\backend\src\main\java\com\groupware\service\ApprovalService.java:184: error: cannot find symbol
+  C:\dev\workspace\test02\backend\src\main\java\com\groupware\service\ApprovalService.java:123: error: cannot find symbol
+  C:\dev\workspace\test02\backend\src\main\java\com\groupware\service\ApprovalService.java:154: error: cannot find symbol
+  C:\dev\workspace\test02\backend\src\main\java\com\groupware\service\ApprovalService.java:168: error: cannot find symbol
+  C:\dev\workspace\test02\backend\src\main\java\com\groupware\service\ApprovalService.java:184: error: cannot find symbol

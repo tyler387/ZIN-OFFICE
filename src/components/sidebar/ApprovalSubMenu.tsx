@@ -1,18 +1,36 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from 'antd';
 import { SettingOutlined } from '@ant-design/icons';
 import { approvalSubMenu } from '../../layouts/menuConfig';
+import { approvalApi } from '../../api/approvalApi';
 
 const ApprovalSubMenu: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
+    const [unreadRefCount, setUnreadRefCount] = useState<number>(0);
+
+    const fetchUnreadCount = async () => {
+        try {
+            const res = await approvalApi.getReferenceCount();
+            setUnreadRefCount(res.data);
+        } catch (e) {
+            console.error('Failed to fetch unread reference count', e);
+        }
+    };
+
+    useEffect(() => {
+        fetchUnreadCount();
+        // Set up periodic refresh or refresh on route changes if needed
+        const intervalId = setInterval(fetchUnreadCount, 60000); // 1 minute
+        return () => clearInterval(intervalId);
+    }, [location.pathname]); // Also refresh when navigating (often implies actions happened)
 
     return (
         <>
             <div style={{ flex: 1, overflowY: 'auto', paddingBottom: 8 }}>
                 <div style={{ padding: 12 }}>
-                    <Button block>새 결재 진행</Button>
+                    <Button type="primary" block onClick={() => navigate('/approval/new')}>새 결재 진행</Button>
                 </div>
 
                 {approvalSubMenu.map((section) => (
@@ -76,7 +94,25 @@ const ApprovalSubMenu: React.FC = () => {
                                     <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                         {item.label}
                                     </span>
-                                    {item.badge !== undefined && item.badge > 0 && (
+                                    {item.key === 'ap-ref' && unreadRefCount > 0 ? (
+                                        <span
+                                            style={{
+                                                marginLeft: 'auto',
+                                                background: '#EE5D50', // highlight color for real unread count
+                                                color: '#FFFFFF',
+                                                borderRadius: 9,
+                                                fontSize: 11,
+                                                padding: '1px 6px',
+                                                minWidth: 20,
+                                                textAlign: 'center',
+                                                lineHeight: '18px',
+                                                flexShrink: 0,
+                                                fontWeight: 600
+                                            }}
+                                        >
+                                            {unreadRefCount}
+                                        </span>
+                                    ) : item.badge !== undefined && item.badge > 0 && item.key !== 'ap-ref' ? (
                                         <span
                                             style={{
                                                 marginLeft: 'auto',
@@ -93,7 +129,7 @@ const ApprovalSubMenu: React.FC = () => {
                                         >
                                             {item.badge}
                                         </span>
-                                    )}
+                                    ) : null}
                                 </div>
                             );
                         })}

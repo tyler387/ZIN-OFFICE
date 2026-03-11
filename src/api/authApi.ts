@@ -5,8 +5,16 @@ export interface UserDto {
     email: string;
     name: string;
     role: string;
-    department?: string;
-    position?: string;
+    employee?: {
+        id: number;
+        position: string;
+        phone?: string;
+        officeLocation?: string;
+        department: {
+            id: number;
+            name: string;
+        };
+    };
 }
 
 export interface AuthResponse {

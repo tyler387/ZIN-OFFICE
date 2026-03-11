@@ -1,28 +1,101 @@
-import React from 'react';
-import { Table, Tag, Button, Space } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
-
-const dummyData = [
-    { key: '1', id: 'AP-2026-001', title: '출장 경비 신청', author: '김철수', status: '진행', date: '2026-03-05', dept: '개발팀' },
-    { key: '2', id: 'AP-2026-002', title: '연차 휴가 신청', author: '이영희', status: '완료', date: '2026-03-04', dept: 'IT서비스' },
-    { key: '3', id: 'AP-2026-003', title: '물품 구매 요청서', author: '박민수', status: '진행', date: '2026-03-04', dept: '총무팀' },
-    { key: '4', id: 'AP-2026-004', title: '프로젝트 예산 변경 요청', author: '최지연', status: '반려', date: '2026-03-03', dept: '기획팀' },
-    { key: '5', id: 'AP-2026-005', title: '재택근무 신청', author: '홍길동', status: '임시저장', date: '2026-03-03', dept: '개발팀' },
-    { key: '6', id: 'AP-2026-006', title: '외부 교육 신청', author: '강서연', status: '진행', date: '2026-03-02', dept: 'IT서비스' },
-    { key: '7', id: 'AP-2026-007', title: '법인카드 사용 승인', author: '정호진', status: '완료', date: '2026-03-01', dept: '재무팀' },
-    { key: '8', id: 'AP-2026-008', title: '서버 증설 요청', author: '김철수', status: '진행', date: '2026-02-28', dept: '개발팀' },
-];
+import React, { useEffect, useState } from 'react';
+import { Table, Tag, message } from 'antd';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import { approvalApi } from '../api/approvalApi';
+import { approvalSubMenu } from '../layouts/menuConfig';
+import dayjs from 'dayjs';
 
 const statusConfig: Record<string, { bg: string; text: string }> = {
-    '진행': { bg: 'var(--status-pending-bg)', text: 'var(--status-pending-text)' },
-    '완료': { bg: 'var(--status-done-bg)', text: 'var(--status-done-text)' },
-    '반려': { bg: 'var(--status-reject-bg)', text: 'var(--status-reject-text)' },
-    '임시저장': { bg: 'var(--status-draft-bg)', text: 'var(--status-draft-text)' },
+    'PENDING': { bg: 'var(--status-pending-bg)', text: 'var(--status-pending-text)' },
+    'APPROVED': { bg: 'var(--status-done-bg)', text: 'var(--status-done-text)' },
+    'REJECTED': { bg: 'var(--status-reject-bg)', text: 'var(--status-reject-text)' },
+    'DRAFT': { bg: 'var(--status-draft-bg)', text: 'var(--status-draft-text)' },
+    'CANCELLED': { bg: '#d9d9d9', text: '#555' },
+};
+
+const getStatusText = (status: string) => {
+    switch (status) {
+        case 'PENDING': return '진행';
+        case 'APPROVED': return '완료';
+        case 'REJECTED': return '반려';
+        case 'DRAFT': return '임시저장';
+        case 'CANCELLED': return '취소됨';
+        default: return status;
+    }
 };
 
 const ApprovalHomePage: React.FC = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+    const { folder, deptId } = useParams();
+
+    const [data, setData] = useState<any[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [page, setPage] = useState(1);
+    const [total, setTotal] = useState(0);
+
+    const getPageTitle = () => {
+        const path = location.pathname;
+
+        for (const section of approvalSubMenu) {
+            for (const item of section.items) {
+                if (item.path === path) {
+                    return item.label.replace(/[<>]/g, '');
+                }
+            }
+        }
+
+        if (path.includes('/reference')) return '참조/열람 대기 문서';
+        if (path.includes('/planned')) return '결재 예정 문서';
+        if (path.includes('/received')) return '결재 수신 문서';
+        if (path.includes('/personal/')) return `개인 문서함 - ${folder}`;
+        if (path.includes('/dept/')) return `부서 문서함 - ${folder}`;
+        return '결재 대기 문서';
+    };
+
+    const fetchData = async (currentPage = 1) => {
+        try {
+            setLoading(true);
+            const path = location.pathname;
+            let res;
+
+            // page is 0-indexed for backend API
+            if (path.includes('/reference')) {
+                res = await approvalApi.getReferenceList(currentPage - 1, 10);
+            } else if (path.includes('/planned')) {
+                res = await approvalApi.getPlannedList(currentPage - 1, 10);
+            } else if (path.includes('/received')) {
+                res = await approvalApi.getPendingList(currentPage - 1, 10);
+            } else if (path.includes('/personal/')) {
+                res = await approvalApi.getPersonalDocs(folder || 'default', currentPage - 1);
+            } else if (path.includes('/dept/')) {
+                res = await approvalApi.getDeptDocs(deptId || '', folder || 'default', currentPage - 1);
+            } else {
+                res = await approvalApi.getPendingList(currentPage - 1, 10);
+            }
+
+            const { content, totalElements } = res.data;
+            setData(content.map((item: any) => ({
+                key: item.id,
+                id: item.docNo || '임시문서',
+                title: item.title,
+                author: item.submitter.name,
+                status: item.status,
+                date: dayjs(item.submittedAt || Date.now()).format('YYYY-MM-DD'),
+                dept: item.submitter.departmentName
+            })));
+            setTotal(totalElements);
+        } catch (error) {
+            message.error('목록을 불러오는데 실패했습니다.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        setPage(1); // Reset page on route change
+        fetchData(1);
+    }, [location.pathname, folder, deptId]);
 
     const columns = [
         {
@@ -30,7 +103,7 @@ const ApprovalHomePage: React.FC = () => {
             dataIndex: 'id',
             key: 'id',
             width: 140,
-            render: (text: string, record: typeof dummyData[0]) => (
+            render: (text: string, record: any) => (
                 <a onClick={() => navigate(`/approval/${record.key}`)} style={{ color: 'var(--primary)', cursor: 'pointer' }}>
                     {text}
                 </a>
@@ -71,7 +144,7 @@ const ApprovalHomePage: React.FC = () => {
                             fontSize: 12,
                         }}
                     >
-                        {status}
+                        {getStatusText(status)}
                     </Tag>
                 );
             },
@@ -88,18 +161,26 @@ const ApprovalHomePage: React.FC = () => {
         <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
                 <h2 style={{ fontSize: 18, fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>
-                    결재 대기 문서
+                    {getPageTitle()}
                 </h2>
-                <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate('/approval/new')}>
-                    새 결재 작성
-                </Button>
             </div>
 
             <Table
                 columns={columns}
-                dataSource={dummyData}
+                dataSource={data}
+                loading={loading}
                 size="small"
-                pagination={{ pageSize: 10, showSizeChanger: false, position: ['bottomCenter'] }}
+                pagination={{
+                    current: page,
+                    pageSize: 10,
+                    total: total,
+                    showSizeChanger: false,
+                    position: ['bottomCenter'],
+                    onChange: (p) => {
+                        setPage(p);
+                        fetchData(p);
+                    }
+                }}
                 style={{ borderRadius: 6, overflow: 'hidden' }}
                 onRow={(record) => ({
                     style: { height: 40, cursor: 'pointer' },

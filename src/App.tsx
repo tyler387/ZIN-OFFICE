@@ -79,6 +79,11 @@ const App: React.FC = () => {
         <Route path="home" element={<HomePage />} />
         <Route path="approval" element={<ApprovalHomePage />} />
         <Route path="approval/new" element={<ApprovalNewPage />} />
+        <Route path="approval/reference" element={<ApprovalHomePage />} />
+        <Route path="approval/received" element={<ApprovalHomePage />} />
+        <Route path="approval/planned" element={<ApprovalHomePage />} />
+        <Route path="approval/personal/:folder" element={<ApprovalHomePage />} />
+        <Route path="approval/dept/:deptId/:folder" element={<ApprovalHomePage />} />
         <Route path="approval/:id" element={<ApprovalDetailPage />} />
         <Route path="board" element={<Navigate to="/board/notice" replace />} />
         <Route path="board/:boardId" element={<BoardPage />} />

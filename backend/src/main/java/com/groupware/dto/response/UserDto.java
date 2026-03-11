@@ -1,5 +1,6 @@
 package com.groupware.dto.response;
 
+import com.groupware.domain.Employee;
 import com.groupware.domain.Role;
 import com.groupware.domain.User;
 import lombok.Builder;
@@ -12,18 +13,47 @@ public class UserDto {
     private String email;
     private String name;
     private Role role;
-    private String department;
-    private String position;
+    private EmployeeInfoDto employee;
+
+    @Getter
+    @Builder
+    public static class EmployeeInfoDto {
+        private Long id;
+        private String position;
+        private DepartmentDto department;
+        private String phone;
+        private String officeLocation;
+    }
+
+    @Getter
+    @Builder
+    public static class DepartmentDto {
+        private Long id;
+        private String name;
+    }
 
     public static UserDto from(User user) {
+        EmployeeInfoDto employeeInfoDto = null;
+        if (user.getEmployee() != null) {
+            Employee emp = user.getEmployee();
+            employeeInfoDto = EmployeeInfoDto.builder()
+                    .id(emp.getId())
+                    .position(emp.getPosition())
+                    .department(DepartmentDto.builder()
+                            .id(emp.getDepartment().getId())
+                            .name(emp.getDepartment().getName())
+                            .build())
+                    .phone(emp.getPhone())
+                    .officeLocation(emp.getOfficeLocation())
+                    .build();
+        }
+
         return UserDto.builder()
                 .id(user.getId())
                 .email(user.getEmail())
                 .name(user.getName())
                 .role(user.getRole())
-                // TODO: Entity에 부서, 직급 필드 추가 시 매핑
-                .department("개발팀")
-                .position("사원")
+                .employee(employeeInfoDto)
                 .build();
     }
 }
