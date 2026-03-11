@@ -51,6 +51,24 @@ public class SecurityConfig {
                 // URL별 인가 규칙
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
+                                "/",
+                                "/index.html",
+                                "/vite.svg",
+                                "/assets/**",
+                                "/login",
+                                "/home",
+                                "/approval/**",
+                                "/board/**",
+                                "/drive/**",
+                                "/alldocs",
+                                "/docmgr/**",
+                                "/mail/**",
+                                "/report/**",
+                                "/attendance/**",
+                                "/messenger",
+                                "/calendar",
+                                "/reserve/**",
+                                "/community/**",
                                 "/api/auth/login",
                                 "/api/auth/refresh",
                                 "/h2-console/**"
