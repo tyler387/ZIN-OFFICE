@@ -68,7 +68,7 @@ public class DataInitializer implements ApplicationRunner {
                 "HQ 12F"
         );
         createUser(
-                "kimj@compnay.com",
+                "kimj@company.com",
                 "password123",
                 "Kim Jihwan",
                 Role.USER,
