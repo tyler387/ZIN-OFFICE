@@ -33,59 +33,59 @@ public class DataInitializer implements ApplicationRunner {
             return;
         }
 
-        Department management = createDepartment("Management", null, 1);
-        Department development = createDepartment("Development", null, 2);
-        Department sales = createDepartment("Sales", null, 3);
+        Department management = createDepartment("경영지원본부", null, 1);
+        Department development = createDepartment("개발팀", null, 2);
+        Department sales = createDepartment("영업팀", null, 3);
 
         createUser(
                 "admin@company.com",
                 "password123",
-                "Admin",
+                "관리자",
                 Role.ADMIN,
                 management,
-                "Manager",
+                "대리",
                 "010-0000-0001",
-                "HQ 12F"
+                "본사 12층"
         );
         createUser(
                 "hong@company.com",
                 "password123",
-                "Hong Gildong",
+                "홍길동",
                 Role.USER,
                 development,
-                "Developer",
+                "주임",
                 "010-1234-5678",
-                "HQ 12F"
+                "본사 12층"
         );
         createUser(
                 "kim@company.com",
                 "password123",
-                "Kim Cheolsu",
+                "김철수",
                 Role.USER,
                 development,
-                "Developer",
+                "대리",
                 "010-0000-0002",
-                "HQ 12F"
+                "본사 12층"
         );
         createUser(
                 "kimj@company.com",
                 "password123",
-                "Kim Jihwan",
+                "김진환",
                 Role.USER,
                 development,
-                "Staff",
+                "사원",
                 "010-0000-0004",
-                "HQ 12F"
+                "본사 12층"
         );
         createUser(
                 "lee@company.com",
                 "password123",
-                "Lee Younghee",
+                "이영희",
                 Role.USER,
                 sales,
-                "Staff",
+                "대리",
                 "010-0000-0003",
-                "HQ 9F"
+                "본사 9층"
         );
 
         log.info("Initialized demo users for local/render demo");
