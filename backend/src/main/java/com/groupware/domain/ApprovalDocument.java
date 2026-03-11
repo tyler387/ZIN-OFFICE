@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import com.groupware.global.util.KoreaTime;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -103,12 +104,12 @@ public class ApprovalDocument {
     public void submit(String docNo) {
         this.docNo = docNo;
         this.status = ApprovalStatus.PENDING;
-        this.submittedAt = LocalDateTime.now();
+        this.submittedAt = KoreaTime.nowDateTime();
     }
 
     public void complete(ApprovalStatus status) {
         this.status = status;
-        this.completedAt = LocalDateTime.now();
+        this.completedAt = KoreaTime.nowDateTime();
     }
 
     public void moveToNextStep() {

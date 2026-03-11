@@ -8,6 +8,7 @@ import com.groupware.dto.response.approval.ApprovalDetailDto;
 import com.groupware.dto.response.approval.ApprovalDocumentDto;
 import com.groupware.global.exception.CustomException;
 import com.groupware.global.exception.ErrorCode;
+import com.groupware.global.util.KoreaTime;
 import com.groupware.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -15,7 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +55,7 @@ public class ApprovalService {
                 .submitter(submitter)
                 .department(submitter.getDepartment())
                 .currentStep(1)
-                .submittedAt(req.isDraft() ? null : java.time.LocalDateTime.now())
+                .submittedAt(req.isDraft() ? null : KoreaTime.nowDateTime())
                 .build();
 
         // 첨부파일 매핑

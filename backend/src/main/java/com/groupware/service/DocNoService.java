@@ -1,13 +1,12 @@
 package com.groupware.service;
 
 import com.groupware.domain.DocNoSequence;
+import com.groupware.global.util.KoreaTime;
 import com.groupware.repository.DocNoSequenceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +21,7 @@ public class DocNoService {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public synchronized String nextDocNo(String prefix) {
-        int currentYear = LocalDate.now().getYear();
+        int currentYear = KoreaTime.nowDate().getYear();
 
         DocNoSequence sequence = docNoSequenceRepository.findByPrefixAndDocYear(prefix, currentYear)
                 .orElseGet(() -> DocNoSequence.builder()

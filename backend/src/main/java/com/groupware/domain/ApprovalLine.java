@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import com.groupware.global.util.KoreaTime;
 
 import java.time.LocalDateTime;
 
@@ -61,7 +62,7 @@ public class ApprovalLine {
     public void processLine(ApprovalLineStatus status, String comment) {
         this.status = status;
         this.comment = comment;
-        this.processedAt = LocalDateTime.now();
+        this.processedAt = KoreaTime.nowDateTime();
     }
     
     public void markAsViewed() {

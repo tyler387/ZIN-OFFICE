@@ -9,6 +9,7 @@ import com.groupware.dto.response.doc.DocDetailDto;
 import com.groupware.dto.response.doc.DocListDto;
 import com.groupware.global.exception.CustomException;
 import com.groupware.global.exception.ErrorCode;
+import com.groupware.global.util.KoreaTime;
 import com.groupware.repository.ApprovalDocumentRepository;
 import com.groupware.repository.DocViewHistoryRepository;
 import com.groupware.repository.EmployeeRepository;
@@ -18,7 +19,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,7 +47,7 @@ public class DocService {
                 docs = docViewHistoryRepository.findRecentViewedDocsByEmployee(userId, pageable);
                 break;
             case "updated":
-                docs = documentRepository.findUpdatedDocs(LocalDateTime.now().minusDays(7), pageable);
+                docs = documentRepository.findUpdatedDocs(KoreaTime.nowDateTime().minusDays(7), pageable);
                 break;
             case "pending-approval":
                 docs = documentRepository.findPendingDocumentsByApprover(userId, pageable);

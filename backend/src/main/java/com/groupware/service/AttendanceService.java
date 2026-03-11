@@ -7,6 +7,7 @@ import com.groupware.domain.User;
 import com.groupware.dto.response.AttendanceDto;
 import com.groupware.global.exception.CustomException;
 import com.groupware.global.exception.ErrorCode;
+import com.groupware.global.util.KoreaTime;
 import com.groupware.repository.AttendanceRepository;
 import com.groupware.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -41,14 +42,14 @@ public class AttendanceService {
             throw new CustomException(ErrorCode.USER_NOT_FOUND, "직원 정보가 없습니다.");
         }
 
-        LocalDate today = LocalDate.now();
+        LocalDate today = KoreaTime.nowDate();
         
         // 이미 출근 기록이 있는지 확인
         if (attendanceRepository.findByUserIdAndWorkDate(userId, today).isPresent()) {
             throw new CustomException(ErrorCode.INVALID_INPUT, "이미 출근 처리가 되었습니다.");
         }
 
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = KoreaTime.nowDateTime();
         AttendanceStatus status = now.toLocalTime().isAfter(ON_TIME_LIMIT) ? 
                 AttendanceStatus.LATE : AttendanceStatus.PRESENT;
 
@@ -68,7 +69,7 @@ public class AttendanceService {
      */
     @Transactional
     public AttendanceDto clockOut(Long userId) {
-        LocalDate today = LocalDate.now();
+        LocalDate today = KoreaTime.nowDate();
         
         Attendance attendance = attendanceRepository.findByUserIdAndWorkDate(userId, today)
                 .orElseThrow(() -> new CustomException(ErrorCode.INVALID_INPUT, "오늘의 출근 기록이 없습니다."));
@@ -77,7 +78,7 @@ public class AttendanceService {
             throw new CustomException(ErrorCode.INVALID_INPUT, "이미 퇴근 처리가 되었습니다.");
         }
 
-        attendance.clockOut(LocalDateTime.now());
+        attendance.clockOut(KoreaTime.nowDateTime());
         // Dirty checking에 의해 자동 update 됨
         return AttendanceDto.from(attendance);
     }
@@ -86,7 +87,7 @@ public class AttendanceService {
      * 오늘의 내 근태 기록 조회
      */
     public AttendanceDto getTodayAttendance(Long userId) {
-        LocalDate today = LocalDate.now();
+        LocalDate today = KoreaTime.nowDate();
         return attendanceRepository.findByUserIdAndWorkDate(userId, today)
                 .map(AttendanceDto::from)
                 .orElse(null); // 기록이 없으면 null 반환
