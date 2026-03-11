@@ -51,6 +51,7 @@ replay_pid*
 
 # Gradle
 .gradle/
+.gradle-cache/
 build/
 !gradle/wrapper/gradle-wrapper.jar
 
@@ -60,4 +61,3 @@ HELP.md
 # Uploads directory
 /backend/uploads/
 /uploads/
-
