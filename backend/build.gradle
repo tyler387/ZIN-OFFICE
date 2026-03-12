@@ -4,6 +4,8 @@ plugins {
     id 'io.spring.dependency-management' version '1.1.7'
 }
 
+import org.gradle.internal.os.OperatingSystem
+
 group = 'com.groupware'
 version = '0.0.1-SNAPSHOT'
 
@@ -47,6 +49,20 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.register('frontendBuild', Exec) {
+    workingDir = project.file('..')
+
+    if (OperatingSystem.current().isWindows()) {
+        commandLine 'cmd', '/c', 'npm', 'run', 'build'
+    } else {
+        commandLine 'npm', 'run', 'build'
+    }
+}
+
+tasks.named('processResources') {
+    dependsOn tasks.named('frontendBuild')
 }
 
 tasks.named('test') {

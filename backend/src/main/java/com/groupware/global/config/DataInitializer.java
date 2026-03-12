@@ -45,7 +45,7 @@ public class DataInitializer implements ApplicationRunner {
                 management,
                 "대리",
                 "010-0000-0001",
-                "본사 12층"
+                "본사 9층"
         );
         createUser(
                 "hong@company.com",
@@ -55,7 +55,7 @@ public class DataInitializer implements ApplicationRunner {
                 development,
                 "주임",
                 "010-1234-5678",
-                "본사 12층"
+                "본사 9층"
         );
         createUser(
                 "kim@company.com",
@@ -65,7 +65,7 @@ public class DataInitializer implements ApplicationRunner {
                 development,
                 "대리",
                 "010-0000-0002",
-                "본사 12층"
+                "본사 9층"
         );
         createUser(
                 "kimj@company.com",
@@ -75,7 +75,7 @@ public class DataInitializer implements ApplicationRunner {
                 development,
                 "사원",
                 "010-0000-0004",
-                "본사 12층"
+                "본사 9층"
         );
         createUser(
                 "lee@company.com",

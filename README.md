@@ -1,73 +1,52 @@
-# React + TypeScript + Vite
+# Groupware Web App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+이 프로젝트는 `React + Vite` 프런트엔드와 `Spring Boot` 백엔드를 하나의 웹앱으로 배포하도록 구성되어 있습니다.
 
-Currently, two official plugins are available:
+## 구조
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- `src/`: React SPA
+- `backend/`: Spring Boot API 및 정적 파일 서빙
+- `backend/src/main/resources/static/`: 프런트엔드 빌드 결과물
 
-## React Compiler
+`npm run build`를 실행하면 프런트엔드가 바로 `backend/src/main/resources/static`으로 빌드됩니다.  
+`backend/gradlew.bat bootJar` 또는 Gradle의 `processResources` 단계에서도 프런트 빌드가 자동 실행됩니다.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 개발 실행
 
-## Expanding the ESLint configuration
+프런트엔드 개발 서버:
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+백엔드 서버:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+cd backend
+gradlew.bat bootRun
 ```
+
+Vite 개발 서버는 `/api` 요청을 `http://localhost:8080`으로 프록시합니다.
+
+## 웹앱 빌드
+
+프런트엔드만 빌드:
+
+```bash
+npm run build
+```
+
+프런트엔드 포함 전체 웹앱 JAR 빌드:
+
+```bash
+npm run build:webapp
+```
+
+또는
+
+```bash
+cd backend
+gradlew.bat bootJar
+```
+
+빌드가 끝나면 Spring Boot JAR 안에 SPA 정적 리소스가 포함되어 단일 웹앱으로 배포할 수 있습니다.
