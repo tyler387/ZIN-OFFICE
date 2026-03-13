@@ -2,7 +2,7 @@ FROM gradle:8.12.1-jdk17 AS builder
 
 WORKDIR /app
 COPY . /app
-RUN bash -lc "gradle clean bootJar -x test --no-daemon --console=plain > /tmp/gradle.log 2>&1 || { tail -n 200 /tmp/gradle.log; exit 1; }"
+RUN bash -lc "gradle clean bootJar -x test -PskipFrontendBuild=true --no-daemon --console=plain > /tmp/gradle.log 2>&1 || { tail -n 200 /tmp/gradle.log; exit 1; }"
 
 FROM eclipse-temurin:17-jre
 
