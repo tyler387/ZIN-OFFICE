@@ -1,50 +1,36 @@
-# Groupware Web App
+# 그룹웨어 웹앱
 
-React + Vite 프론트엔드와 Spring Boot 백엔드를 하나의 서비스로 배포하는 그룹웨어 프로젝트입니다.
+React + Vite 프론트엔드와 Spring Boot 백엔드를 단일 서비스로 운영하는 프로젝트입니다.
 
-## Tech Stack
+## 기술 스택
 
-- Frontend: React 19, TypeScript, Vite, Ant Design
-- Backend: Spring Boot 3.4, Spring Security, Spring Data JPA
-- Build: Gradle 8.12, Java 17
-- Default DB (local): H2 (in-memory)
-- Deployment: Docker (Render 배포 가능)
+- 프론트엔드: React 19, TypeScript, Vite, Ant Design
+- 백엔드: Spring Boot 3.4, Spring Security, Spring Data JPA
+- 빌드: Gradle 8.12, Java 17
+- 기본 DB(로컬): H2 (in-memory)
+- 배포: Docker, Render
 
-## Project Structure
+## 프로젝트 구조
 
 ```text
 .
-├─ src/                              # React SPA
-├─ backend/                          # Spring Boot API
+├─ src/                              # React 앱 소스
+├─ backend/                          # Spring Boot 백엔드
 │  ├─ src/main/java/...
-│  └─ src/main/resources/static/     # Vite build output
+│  └─ src/main/resources/static/     # 프론트 빌드 산출물
 ├─ package.json
 └─ README.md
 ```
 
-## Prerequisites
+## 사전 요구사항
 
-- Node.js 20+
-- Java 17+
+- Node.js 20 이상
+- Java 17 이상
 - (Windows) PowerShell 또는 CMD
 
-프로젝트 레포에는 OS 의존적인 Gradle Java 경로 고정(`org.gradle.java.home`)을 두지 않습니다.
-Render Docker 환경과 충돌할 수 있기 때문입니다.
+## 로컬 실행
 
-로컬에서만 Java 17 경로를 강제하고 싶다면 사용자 전역 파일을 사용하세요.
-
-- Windows: `%USERPROFILE%\.gradle\gradle.properties`
-- macOS/Linux: `~/.gradle/gradle.properties`
-
-예시:
-
-```properties
-org.gradle.java.home=C:/Program Files/Java/jdk-17
-```
-
-## Local Development
-
-### 1) Frontend dev server
+### 1) 프론트 개발 서버
 
 ```bash
 npm install
@@ -54,7 +40,7 @@ npm run dev
 - 기본 주소: `http://localhost:5173`
 - `/api` 요청은 Vite 프록시를 통해 `http://localhost:8080`으로 전달됩니다.
 
-### 2) Backend server
+### 2) 백엔드 실행
 
 Windows:
 
@@ -72,17 +58,17 @@ cd backend
 
 - 기본 주소: `http://localhost:8080`
 
-## Build
+## 빌드
 
-### Frontend only
+### 프론트만 빌드
 
 ```bash
 npm run build
 ```
 
-Vite 결과물이 `backend/src/main/resources/static`에 생성됩니다.
+프론트 산출물은 `backend/src/main/resources/static`에 생성됩니다.
 
-### Full webapp jar
+### 웹앱 JAR 빌드
 
 Windows:
 
@@ -97,75 +83,84 @@ cd backend
 .\gradlew.bat bootJar
 ```
 
-## Docker Deployment
+## Docker 배포
 
-`backend/Dockerfile`은 멀티 스테이지 빌드입니다.
+현재 `backend/Dockerfile`은 백엔드 컨텍스트(`backend`) 기준으로 빌드됩니다.
 
-1. Node 스테이지에서 프론트엔드 빌드
-2. Gradle 스테이지에서 Spring Boot jar 빌드
-3. JRE 스테이지에서 런타임 실행
+- Render Root Directory: `backend`
+- Dockerfile Path: `Dockerfile`
 
-로컬 빌드:
+중요:
+
+- Docker 빌드 시 `-PskipFrontendBuild=true`로 프론트 재빌드를 건너뜁니다.
+- 따라서 프론트 수정 후에는 반드시 로컬에서 `npm run build`를 실행하고,
+  `backend/src/main/resources/static/**` 변경분을 커밋해야 합니다.
+
+로컬 Docker 빌드 예시(backend 디렉터리에서 실행):
 
 ```bash
-docker build -f backend/Dockerfile .
-docker run -p 8080:8080 -e PORT=8080 <IMAGE_ID>
+cd backend
+docker build -t groupware-backend .
+docker run -p 8080:8080 -e PORT=8080 groupware-backend
 ```
 
-## Render Deployment (Recommended)
+## Render 배포 가이드
 
-### Web Service
+### Web Service 설정
 
 - Environment: Docker
-- Dockerfile Path: `backend/Dockerfile`
-- Docker build context: repository root
+- Repository: 현재 운영 대상 저장소/브랜치 확인
+- Root Directory: `backend`
+- Dockerfile Path: `Dockerfile`
 
-필수 환경변수 예시:
+### 필수 환경변수
 
-- `PORT=8080` (Render가 자동 주입하므로 보통 별도 설정 불필요)
-- `JWT_SECRET=<your-secret>`
-- DB 사용 시 `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD`
+- `JWT_SECRET=<실제 시크릿>`
+- DB 사용 시:
+  - `SPRING_DATASOURCE_URL`
+  - `SPRING_DATASOURCE_USERNAME`
+  - `SPRING_DATASOURCE_PASSWORD`
 
-### Database
+`PORT`는 Render가 자동 주입하므로 일반적으로 별도 설정이 필요 없습니다.
 
-운영 환경은 H2 대신 PostgreSQL 사용을 권장합니다.
-
-권장 이유:
-
-- Render Managed Postgres 제공
-- 백업/복구/운영 관리가 용이
-- Spring Boot/JPA와 호환성 높음
-
-## Database Notes
+## 데이터베이스 안내
 
 현재 기본 설정은 `backend/src/main/resources/application.yml`에서 H2를 사용합니다.
 
-운영 전환 시 최소 변경:
+운영 환경은 PostgreSQL 전환을 권장합니다.
+
+권장 변경:
 
 1. PostgreSQL 드라이버 추가 (`org.postgresql:postgresql`)
-2. datasource URL/계정 환경변수화
+2. datasource 설정 환경변수화
 3. `ddl-auto: create-drop` 제거 (`validate` 또는 `none`)
 4. Flyway/Liquibase 같은 마이그레이션 도구 도입
 
-## Useful Commands
+## 자주 쓰는 명령어
 
 ```bash
-# Lint
+# 린트
 npm run lint
 
-# Frontend preview
+# 프론트 프리뷰
 npm run preview
 ```
 
-## Troubleshooting
+## 트러블슈팅
 
-### Gradle이 Java 8로 실행되는 경우
+### Render에서 `npm` 관련 에러가 날 때
+
+로그 예:
+
+`Execution failed for task ':frontendBuild'. A problem occurred starting process 'command 'npm''`
+
+확인 항목:
+
+1. Docker 빌드 명령에 `-PskipFrontendBuild=true`가 포함되어 있는지
+2. 프론트 빌드 산출물(`backend/src/main/resources/static/**`)이 최신 커밋인지
+3. Render Root Directory가 `backend`로 맞는지
+
+### 로컬 Gradle/JDK 버전 문제
 
 - `java -version` 확인
-- 사용자 전역 `~/.gradle/gradle.properties`에 `org.gradle.java.home` 설정
-- Docker/CI 환경에서는 레포 내부에 OS 절대경로(`C:/...`)를 커밋하지 않기
-
-### Windows에서 gradlew 실행 오류
-
-- `cd backend` 경로에서 실행했는지 확인
-- `.\gradlew.bat -version`으로 실제 Gradle JVM 버전 확인
+- `.\gradlew.bat -version`으로 Gradle이 실제 어떤 JVM을 쓰는지 확인
