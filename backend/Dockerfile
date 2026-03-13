@@ -1,33 +1,12 @@
-FROM node:20-bookworm-slim AS frontend-builder
+FROM gradle:8.12.1-jdk17 AS builder
 
 WORKDIR /app
-
-COPY package.json package-lock.json ./
-RUN npm ci
-
-COPY index.html ./
-COPY tsconfig.json tsconfig.app.json tsconfig.node.json ./
-COPY vite.config.ts eslint.config.js ./
-COPY public ./public
-COPY src ./src
-COPY backend ./backend
-
-RUN npm run build
-
-FROM gradle:8.12.1-jdk17 AS backend-builder
-
-WORKDIR /app/backend
-COPY backend /app/backend
-COPY --from=frontend-builder /app/backend/src/main/resources/static ./src/main/resources/static
-
-RUN gradle clean bootJar -x test -PskipFrontendBuild=true --no-daemon --console=plain
+COPY . /app
+RUN bash -lc "gradle clean bootJar -x test --no-daemon --console=plain > /tmp/gradle.log 2>&1 || { tail -n 200 /tmp/gradle.log; exit 1; }"
 
 FROM eclipse-temurin:17-jre
 
 WORKDIR /app
+COPY --from=builder /app/build/libs/*.jar /app/app.jar
 
-COPY --from=backend-builder /app/backend/build/libs/*.jar /app/app.jar
-
-EXPOSE 8080
-
-ENTRYPOINT ["sh", "-c", "java -Dserver.port=${PORT:-8080} -jar /app/app.jar"]
+CMD ["sh", "-c", "java -Dserver.port=${PORT:-8080} -jar /app/app.jar"]
