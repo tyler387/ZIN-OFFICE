@@ -1,35 +1,37 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Tag, message } from 'antd';
-import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import type { ColumnsType } from 'antd/es/table';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import dayjs from 'dayjs';
 import { approvalApi } from '../api/approvalApi';
 import { approvalSubMenu } from '../layouts/menuConfig';
-import dayjs from 'dayjs';
+import { useResponsive } from '../hooks/useResponsive';
 
-const statusConfig: Record<string, { bg: string; text: string }> = {
-    'PENDING': { bg: 'var(--status-pending-bg)', text: 'var(--status-pending-text)' },
-    'APPROVED': { bg: 'var(--status-done-bg)', text: 'var(--status-done-text)' },
-    'REJECTED': { bg: 'var(--status-reject-bg)', text: 'var(--status-reject-text)' },
-    'DRAFT': { bg: 'var(--status-draft-bg)', text: 'var(--status-draft-text)' },
-    'CANCELLED': { bg: '#d9d9d9', text: '#555' },
+type RowItem = {
+    key: string;
+    id: string;
+    title: string;
+    author: string;
+    status: string;
+    date: string;
+    dept: string;
 };
 
-const getStatusText = (status: string) => {
-    switch (status) {
-        case 'PENDING': return '진행';
-        case 'APPROVED': return '완료';
-        case 'REJECTED': return '반려';
-        case 'DRAFT': return '임시저장';
-        case 'CANCELLED': return '취소됨';
-        default: return status;
-    }
+const statusConfig: Record<string, { bg: string; text: string; label: string }> = {
+    PENDING: { bg: 'var(--status-pending-bg)', text: 'var(--status-pending-text)', label: 'Pending' },
+    APPROVED: { bg: 'var(--status-done-bg)', text: 'var(--status-done-text)', label: 'Approved' },
+    REJECTED: { bg: 'var(--status-reject-bg)', text: 'var(--status-reject-text)', label: 'Rejected' },
+    DRAFT: { bg: 'var(--status-draft-bg)', text: 'var(--status-draft-text)', label: 'Draft' },
+    CANCELLED: { bg: '#d9d9d9', text: '#555', label: 'Cancelled' },
 };
 
 const ApprovalHomePage: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { folder, deptId } = useParams();
+    const { isMobile } = useResponsive();
 
-    const [data, setData] = useState<any[]>([]);
+    const [data, setData] = useState<RowItem[]>([]);
     const [loading, setLoading] = useState(false);
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
@@ -45,12 +47,12 @@ const ApprovalHomePage: React.FC = () => {
             }
         }
 
-        if (path.includes('/reference')) return '참조/열람 대기 문서';
-        if (path.includes('/planned')) return '결재 예정 문서';
-        if (path.includes('/received')) return '결재 수신 문서';
-        if (path.includes('/personal/')) return `개인 문서함 - ${folder}`;
-        if (path.includes('/dept/')) return `부서 문서함 - ${folder}`;
-        return '결재 대기 문서';
+        if (path.includes('/reference')) return 'Reference Documents';
+        if (path.includes('/planned')) return 'Planned Documents';
+        if (path.includes('/received')) return 'Received Documents';
+        if (path.includes('/personal/')) return `Personal Folder - ${folder}`;
+        if (path.includes('/dept/')) return `Department Folder - ${folder}`;
+        return 'Pending Documents';
     };
 
     const fetchData = async (currentPage = 1) => {
@@ -59,7 +61,6 @@ const ApprovalHomePage: React.FC = () => {
             const path = location.pathname;
             let res;
 
-            // page is 0-indexed for backend API
             if (path.includes('/reference')) {
                 res = await approvalApi.getReferenceList(currentPage - 1, 10);
             } else if (path.includes('/planned')) {
@@ -75,65 +76,70 @@ const ApprovalHomePage: React.FC = () => {
             }
 
             const { content, totalElements } = res.data;
-            setData(content.map((item: any) => ({
-                key: item.id,
-                id: item.docNo || '임시문서',
-                title: item.title,
-                author: item.submitter.name,
-                status: item.status,
-                date: dayjs(item.submittedAt || Date.now()).format('YYYY-MM-DD'),
-                dept: item.submitter.departmentName
-            })));
+            setData(
+                content.map((item: any) => ({
+                    key: String(item.id),
+                    id: item.docNo || 'Temporary',
+                    title: item.title,
+                    author: item.submitter.name,
+                    status: item.status,
+                    date: dayjs(item.submittedAt || Date.now()).format('YYYY-MM-DD'),
+                    dept: item.submitter.departmentName,
+                })),
+            );
             setTotal(totalElements);
         } catch (error) {
-            message.error('목록을 불러오는데 실패했습니다.');
+            console.error(error);
+            message.error('Failed to load approval documents.');
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        setPage(1); // Reset page on route change
+        setPage(1);
         fetchData(1);
     }, [location.pathname, folder, deptId]);
 
-    const columns = [
+    const columns: ColumnsType<RowItem> = [
         {
-            title: '문서번호',
+            title: 'Doc No',
             dataIndex: 'id',
             key: 'id',
-            width: 140,
-            render: (text: string, record: any) => (
-                <a onClick={() => navigate(`/approval/${record.key}`)} style={{ color: 'var(--primary)', cursor: 'pointer' }}>
+            width: 130,
+            render: (text, record) => (
+                <a onClick={() => navigate(`/approval/${record.key}`)} style={{ color: 'var(--primary)' }}>
                     {text}
                 </a>
             ),
         },
         {
-            title: '제목',
+            title: 'Title',
             dataIndex: 'title',
             key: 'title',
             ellipsis: true,
         },
         {
-            title: '기안자',
+            title: 'Author',
             dataIndex: 'author',
             key: 'author',
             width: 100,
         },
         {
-            title: '부서',
+            title: 'Department',
             dataIndex: 'dept',
             key: 'dept',
-            width: 100,
+            width: 110,
+            responsive: ['md'],
         },
         {
-            title: '상태',
+            title: 'Status',
             dataIndex: 'status',
             key: 'status',
-            width: 90,
-            render: (status: string) => {
-                const cfg = statusConfig[status] || { bg: '#f0f0f0', text: '#555' };
+            width: 96,
+            render: (status) => {
+                const cfg = statusConfig[status] || { bg: '#f0f0f0', text: '#555', label: status };
+
                 return (
                     <Tag
                         style={{
@@ -144,22 +150,31 @@ const ApprovalHomePage: React.FC = () => {
                             fontSize: 12,
                         }}
                     >
-                        {getStatusText(status)}
+                        {cfg.label}
                     </Tag>
                 );
             },
         },
         {
-            title: '기안일',
+            title: 'Date',
             dataIndex: 'date',
             key: 'date',
             width: 110,
+            responsive: ['md'],
         },
     ];
 
     return (
         <div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+            <div
+                style={{
+                    display: 'flex',
+                    alignItems: isMobile ? 'flex-start' : 'center',
+                    justifyContent: 'space-between',
+                    gap: 8,
+                    marginBottom: 16,
+                }}
+            >
                 <h2 style={{ fontSize: 18, fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>
                     {getPageTitle()}
                 </h2>
@@ -170,16 +185,17 @@ const ApprovalHomePage: React.FC = () => {
                 dataSource={data}
                 loading={loading}
                 size="small"
+                scroll={{ x: isMobile ? 640 : undefined }}
                 pagination={{
                     current: page,
                     pageSize: 10,
-                    total: total,
+                    total,
                     showSizeChanger: false,
                     position: ['bottomCenter'],
-                    onChange: (p) => {
-                        setPage(p);
-                        fetchData(p);
-                    }
+                    onChange: (nextPage) => {
+                        setPage(nextPage);
+                        fetchData(nextPage);
+                    },
                 }}
                 style={{ borderRadius: 6, overflow: 'hidden' }}
                 onRow={(record) => ({

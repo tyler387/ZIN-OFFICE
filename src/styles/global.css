@@ -49,13 +49,23 @@
 html, body, #root {
   width: 100%;
   height: 100%;
-  overflow: hidden;
+  min-height: 100%;
   font-family: 'Pretendard Variable', 'Pretendard', 'Apple SD Gothic Neo', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 13px;
   color: var(--text-primary);
   background: var(--content-bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  overflow: hidden;
+}
+
+@media (max-width: 1023px) {
+  html, body, #root {
+    font-size: 12px;
+  }
 }
 
 a {

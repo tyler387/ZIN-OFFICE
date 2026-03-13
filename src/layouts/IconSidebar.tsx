@@ -3,7 +3,11 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { sidebarMenuItems, sidebarBottomItems, type SidebarMenuItem } from './menuConfig';
 import OrgChartPopup from '../components/common/OrgChartPopup';
 
-const IconSidebar: React.FC = () => {
+interface IconSidebarProps {
+    onNavigate?: () => void;
+}
+
+const IconSidebar: React.FC<IconSidebarProps> = ({ onNavigate }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const [orgPopupVisible, setOrgPopupVisible] = useState(false);
@@ -20,6 +24,7 @@ const IconSidebar: React.FC = () => {
         }
         setOrgPopupVisible(false);
         navigate(item.path);
+        onNavigate?.();
     };
 
     const renderItem = (item: SidebarMenuItem) => {

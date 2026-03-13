@@ -1,63 +1,70 @@
 import React from 'react';
-import { Table, Button, Input, Select } from 'antd';
-import { PlusOutlined, EyeOutlined, SearchOutlined, PaperClipOutlined } from '@ant-design/icons';
+import { Button, Input, Select, Table } from 'antd';
+import type { ColumnsType } from 'antd/es/table';
+import { EyeOutlined, PaperClipOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useResponsive } from '../hooks/useResponsive';
+
+type BoardPost = {
+    key: string;
+    boardId: string;
+    num: number;
+    title: string;
+    author: string;
+    dept: string;
+    date: string;
+    views: number;
+    hasAttach: boolean;
+};
 
 const boardNames: Record<string, string> = {
     notice: '공지사항',
     free: '자유게시판',
-    qna: '질문/답변',
+    qna: '질문답변',
     news: '사내소식',
     resources: '자료공유',
 };
 
-const allPosts = [
-    { key: '1', boardId: 'notice', num: 5, title: '[공지] 2026년 3월 정기점검 안내', author: '관리자', dept: '총무팀', date: '2026-03-05', views: 142, hasAttach: true },
-    { key: '2', boardId: 'notice', num: 4, title: '[공지] 사내 보안 교육 필수 이수 안내', author: '보안팀', dept: '보안팀', date: '2026-03-04', views: 98, hasAttach: false },
-    { key: '3', boardId: 'notice', num: 3, title: '[공지] 3월 조직 개편 안내', author: '인사팀', dept: '인사팀', date: '2026-03-03', views: 210, hasAttach: true },
-    { key: '4', boardId: 'free', num: 12, title: '금요일 회식 참석 여부 확인', author: '김철수', dept: '개발팀', date: '2026-03-04', views: 56, hasAttach: false },
-    { key: '5', boardId: 'free', num: 11, title: '사내 동호회 모집합니다', author: '이영희', dept: '마케팅팀', date: '2026-03-03', views: 73, hasAttach: false },
-    { key: '6', boardId: 'free', num: 10, title: '점심 맛집 추천 부탁드려요', author: '박지훈', dept: '디자인팀', date: '2026-03-03', views: 45, hasAttach: false },
-    { key: '7', boardId: 'free', num: 9, title: '주말 등산 모임 안내', author: '최동욱', dept: '영업팀', date: '2026-03-02', views: 38, hasAttach: false },
-    { key: '8', boardId: 'qna', num: 8, title: 'VPN 연결 관련 문의드립니다', author: '박민수', dept: '개발팀', date: '2026-03-02', views: 31, hasAttach: false },
-    { key: '9', boardId: 'qna', num: 7, title: '휴가 신청 절차 문의', author: '정수진', dept: '기획팀', date: '2026-03-01', views: 22, hasAttach: false },
-    { key: '10', boardId: 'news', num: 6, title: '3월 우수사원 시상식 안내', author: '인사팀', dept: '인사팀', date: '2026-03-05', views: 187, hasAttach: true },
-    { key: '11', boardId: 'news', num: 5, title: '신규 프로젝트 킥오프 미팅 결과', author: '기획팀', dept: '기획팀', date: '2026-03-04', views: 65, hasAttach: true },
-    { key: '12', boardId: 'resources', num: 3, title: '2026년 사내 양식 모음 (최신)', author: '총무팀', dept: '총무팀', date: '2026-03-05', views: 320, hasAttach: true },
-    { key: '13', boardId: 'resources', num: 2, title: '개발 가이드라인 v2.1', author: '개발팀', dept: '개발팀', date: '2026-03-01', views: 145, hasAttach: true },
+const allPosts: BoardPost[] = [
+    { key: '1', boardId: 'notice', num: 5, title: '3월 정기 점검 안내', author: '관리자', dept: '운영팀', date: '2026-03-05', views: 142, hasAttach: true },
+    { key: '2', boardId: 'notice', num: 4, title: '보안 교육 이수 안내', author: '보안팀', dept: '보안팀', date: '2026-03-04', views: 98, hasAttach: false },
+    { key: '3', boardId: 'free', num: 12, title: '점심 모임 참석 체크', author: '김대리', dept: '개발팀', date: '2026-03-04', views: 56, hasAttach: false },
+    { key: '4', boardId: 'qna', num: 8, title: 'VPN 연결 관련 문의', author: '박주임', dept: '개발팀', date: '2026-03-02', views: 31, hasAttach: false },
+    { key: '5', boardId: 'news', num: 6, title: '신규 프로젝트 킥오프 요약', author: '기획팀', dept: '기획팀', date: '2026-03-05', views: 187, hasAttach: true },
+    { key: '6', boardId: 'resources', num: 3, title: '최신 디자인 자료 모음', author: '운영팀', dept: '운영팀', date: '2026-03-05', views: 320, hasAttach: true },
 ];
 
 const BoardPage: React.FC = () => {
     const navigate = useNavigate();
     const { boardId } = useParams<{ boardId: string }>();
+    const { isMobile } = useResponsive();
 
     const currentBoard = boardId || 'notice';
     const boardTitle = boardNames[currentBoard] || '게시판';
-    const filteredPosts = allPosts.filter(p => p.boardId === currentBoard);
+    const filteredPosts = allPosts.filter((post) => post.boardId === currentBoard);
 
-    const columns = [
+    const columns: ColumnsType<BoardPost> = [
         {
             title: '번호',
             dataIndex: 'num',
             key: 'num',
             width: 60,
-            align: 'center' as const,
-            render: (v: number) => <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>{v}</span>,
+            responsive: ['md'],
+            align: 'center',
+            render: (value: number) => <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>{value}</span>,
         },
         {
             title: '제목',
             dataIndex: 'title',
             key: 'title',
             ellipsis: true,
-            render: (text: string, record: typeof allPosts[0]) => (
+            render: (text: string, record: BoardPost) => (
                 <a
                     onClick={() => navigate(`/board/${record.boardId}/posts/${record.key}`)}
                     style={{ color: 'var(--text-primary)', cursor: 'pointer', fontWeight: 500 }}
                 >
                     {text}
-                    {record.hasAttach && (
-                        <PaperClipOutlined style={{ marginLeft: 6, fontSize: 12, color: '#bbb' }} />
-                    )}
+                    {record.hasAttach && <PaperClipOutlined style={{ marginLeft: 6, fontSize: 12, color: '#bbb' }} />}
                 </a>
             ),
         },
@@ -65,8 +72,8 @@ const BoardPage: React.FC = () => {
             title: '작성자',
             dataIndex: 'author',
             key: 'author',
-            width: 100,
-            render: (text: string, record: typeof allPosts[0]) => (
+            width: isMobile ? 88 : 100,
+            render: (text: string, record: BoardPost) => (
                 <div>
                     <div style={{ fontSize: 13 }}>{text}</div>
                     <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{record.dept}</div>
@@ -74,21 +81,24 @@ const BoardPage: React.FC = () => {
             ),
         },
         {
-            title: '작성일',
+            title: '등록일',
             dataIndex: 'date',
             key: 'date',
             width: 110,
+            responsive: ['md'],
             render: (text: string) => <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{text}</span>,
         },
         {
-            title: '조회',
+            title: '조회수',
             dataIndex: 'views',
             key: 'views',
-            width: 70,
-            align: 'center' as const,
-            render: (v: number) => (
+            width: 80,
+            responsive: ['md'],
+            align: 'center',
+            render: (value: number) => (
                 <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>
-                    <EyeOutlined style={{ marginRight: 3 }} />{v}
+                    <EyeOutlined style={{ marginRight: 3 }} />
+                    {value}
                 </span>
             ),
         },
@@ -96,8 +106,16 @@ const BoardPage: React.FC = () => {
 
     return (
         <div>
-            {/* 헤더 */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+            <div
+                style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: isMobile ? 'stretch' : 'center',
+                    marginBottom: 20,
+                    gap: 12,
+                    flexDirection: isMobile ? 'column' : 'row',
+                }}
+            >
                 <h2 style={{ fontSize: 18, fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>
                     {boardTitle}
                 </h2>
@@ -111,16 +129,18 @@ const BoardPage: React.FC = () => {
                 </Button>
             </div>
 
-            {/* 검색 바 */}
-            <div style={{
-                display: 'flex',
-                gap: 8,
-                marginBottom: 16,
-                alignItems: 'center',
-            }}>
+            <div
+                style={{
+                    display: 'flex',
+                    gap: 8,
+                    marginBottom: 16,
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
+                }}
+            >
                 <Select
                     defaultValue="title"
-                    style={{ width: 110 }}
+                    style={{ width: isMobile ? '100%' : 110 }}
                     size="middle"
                     options={[
                         { value: 'title', label: '제목' },
@@ -131,20 +151,20 @@ const BoardPage: React.FC = () => {
                 <Input
                     placeholder="검색어를 입력하세요"
                     prefix={<SearchOutlined style={{ color: '#bbb' }} />}
-                    style={{ maxWidth: 300 }}
+                    style={{ width: isMobile ? '100%' : 300, maxWidth: '100%' }}
                     size="middle"
                 />
                 <Button size="middle">검색</Button>
-                <div style={{ marginLeft: 'auto', fontSize: 12, color: 'var(--text-muted)' }}>
+                <div style={{ marginLeft: isMobile ? 0 : 'auto', width: isMobile ? '100%' : 'auto', fontSize: 12, color: 'var(--text-muted)' }}>
                     총 <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{filteredPosts.length}</span>건
                 </div>
             </div>
 
-            {/* 테이블 */}
             <Table
                 columns={columns}
                 dataSource={filteredPosts}
                 size="middle"
+                scroll={{ x: isMobile ? 560 : undefined }}
                 pagination={{
                     pageSize: 15,
                     showSizeChanger: false,

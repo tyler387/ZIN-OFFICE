@@ -1,8 +1,6 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
-import { MenuOutlined } from '@ant-design/icons';
-
-/* ─── 사이드바 서브메뉴 컴포넌트 ─── */
+import { CloseOutlined, MenuOutlined } from '@ant-design/icons';
 import HomeSubMenu from '../components/sidebar/HomeSubMenu';
 import ApprovalSubMenu from '../components/sidebar/ApprovalSubMenu';
 import MailSubMenu from '../components/sidebar/MailSubMenu';
@@ -17,12 +15,29 @@ import ReserveSubMenu from '../components/sidebar/ReserveSubMenu';
 import CommunitySubMenu from '../components/sidebar/CommunitySubMenu';
 import DefaultSubMenu from '../components/sidebar/DefaultSubMenu';
 
-/* ─── 경로별 메뉴 컨텍스트 ─── */
-type MenuType = 'home' | 'approval' | 'mail' | 'alldocs' | 'docmgr' | 'drive' | 'report' | 'attendance' | 'board' | 'calendar' | 'reserve' | 'community' | 'default';
+type MenuType =
+    | 'home'
+    | 'approval'
+    | 'mail'
+    | 'alldocs'
+    | 'docmgr'
+    | 'drive'
+    | 'report'
+    | 'attendance'
+    | 'board'
+    | 'calendar'
+    | 'reserve'
+    | 'community'
+    | 'default';
 
 interface MenuContext {
     title: string;
     type: MenuType;
+}
+
+interface SubMenuPanelProps {
+    isMobile?: boolean;
+    onToggleSidebar?: () => void;
 }
 
 const getMenuContext = (path: string): MenuContext => {
@@ -42,49 +57,57 @@ const getMenuContext = (path: string): MenuContext => {
     return { title: '홈', type: 'home' };
 };
 
-/* ─── 타입별 콘텐츠 렌더링 ─── */
 const renderContent = (ctx: MenuContext) => {
     switch (ctx.type) {
-        case 'home': return <HomeSubMenu />;
-        case 'approval': return <ApprovalSubMenu />;
-        case 'mail': return <MailSubMenu />;
-        case 'alldocs': return <AllDocsSubMenu />;
-        case 'docmgr': return <DocMgrSubMenu />;
-        case 'drive': return <DriveSubMenu />;
-        case 'report': return <ReportSubMenu />;
-        case 'attendance': return <AttendanceSubMenu />;
-        case 'board': return <BoardSubMenu />;
-        case 'calendar': return <CalendarSubMenu />;
-        case 'reserve': return <ReserveSubMenu />;
-        case 'community': return <CommunitySubMenu />;
-        case 'default': return <DefaultSubMenu title={ctx.title} />;
-        default: return <DefaultSubMenu title={ctx.title} />;
+        case 'home':
+            return <HomeSubMenu />;
+        case 'approval':
+            return <ApprovalSubMenu />;
+        case 'mail':
+            return <MailSubMenu />;
+        case 'alldocs':
+            return <AllDocsSubMenu />;
+        case 'docmgr':
+            return <DocMgrSubMenu />;
+        case 'drive':
+            return <DriveSubMenu />;
+        case 'report':
+            return <ReportSubMenu />;
+        case 'attendance':
+            return <AttendanceSubMenu />;
+        case 'board':
+            return <BoardSubMenu />;
+        case 'calendar':
+            return <CalendarSubMenu />;
+        case 'reserve':
+            return <ReserveSubMenu />;
+        case 'community':
+            return <CommunitySubMenu />;
+        case 'default':
+            return <DefaultSubMenu title={ctx.title} />;
+        default:
+            return <DefaultSubMenu title={ctx.title} />;
     }
 };
 
-/* ═══ SubMenuPanel ═══ */
-const SubMenuPanel: React.FC = () => {
+const SubMenuPanel: React.FC<SubMenuPanelProps> = ({ isMobile = false, onToggleSidebar }) => {
     const location = useLocation();
     const ctx = getMenuContext(location.pathname);
-
-    const handleToggleSidebar = () => {
-        console.log('Toggle sidebar');
-    };
 
     return (
         <div
             style={{
-                width: 286,
-                flexShrink: 0,
+                width: isMobile ? '100%' : 286,
+                flex: isMobile ? 1 : '0 0 286px',
                 background: 'var(--submenu-bg)',
-                borderRight: '1px solid var(--submenu-border)',
+                borderRight: isMobile ? 'none' : '1px solid var(--submenu-border)',
                 display: 'flex',
                 flexDirection: 'column',
                 height: '100%',
                 overflow: 'hidden',
+                minWidth: 0,
             }}
         >
-            {/* Title area (50px) */}
             <div
                 style={{
                     height: 50,
@@ -96,7 +119,9 @@ const SubMenuPanel: React.FC = () => {
                     flexShrink: 0,
                 }}
             >
-                <div
+                <button
+                    type="button"
+                    onClick={onToggleSidebar}
                     style={{
                         width: 28,
                         height: 28,
@@ -107,18 +132,15 @@ const SubMenuPanel: React.FC = () => {
                         cursor: 'pointer',
                         color: '#666',
                         fontSize: 16,
-                        transition: 'background 0.12s',
+                        background: 'transparent',
+                        border: 'none',
                     }}
-                    onClick={handleToggleSidebar}
-                    onMouseEnter={e => (e.currentTarget.style.background = '#f0f0f0')}
-                    onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                 >
-                    <MenuOutlined />
-                </div>
+                    {isMobile ? <CloseOutlined /> : <MenuOutlined />}
+                </button>
                 <span style={{ fontSize: 15, fontWeight: 600, color: '#222' }}>{ctx.title}</span>
             </div>
 
-            {/* Content - 경로별 분기 */}
             {renderContent(ctx)}
         </div>
     );

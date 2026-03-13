@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from 'antd';
-import { RightOutlined, DownOutlined, EditOutlined } from '@ant-design/icons';
+import { DownOutlined, EditOutlined, RightOutlined } from '@ant-design/icons';
 
 const BoardSubMenu: React.FC = () => {
     const [boardOpen, setBoardOpen] = useState(true);
@@ -23,14 +23,13 @@ const BoardSubMenu: React.FC = () => {
     const items = [
         { label: '공지사항', path: '/board/notice' },
         { label: '자유게시판', path: '/board/free' },
-        { label: '질문/답변', path: '/board/qna' },
+        { label: '질문답변', path: '/board/qna' },
         { label: '사내소식', path: '/board/news' },
         { label: '자료공유', path: '/board/resources' },
     ];
 
     return (
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-            {/* 글쓰기 버튼 */}
             <div style={{ padding: '10px 12px' }}>
                 <Button
                     type="primary"
@@ -43,7 +42,6 @@ const BoardSubMenu: React.FC = () => {
                 </Button>
             </div>
 
-            {/* 메뉴 */}
             <div style={{ flex: 1, overflowY: 'auto' }}>
                 <div
                     style={{
@@ -63,25 +61,30 @@ const BoardSubMenu: React.FC = () => {
                     {boardOpen ? <DownOutlined style={{ fontSize: 9, marginRight: 4 }} /> : <RightOutlined style={{ fontSize: 9, marginRight: 4 }} />}
                     <span style={{ flex: 1 }}>게시판</span>
                 </div>
-                {boardOpen && items.map(item => {
-                    const active = currentPath === item.path;
-                    return (
-                        <div
-                            key={item.path}
-                            style={{
-                                ...menuItemStyle,
-                                background: active ? 'var(--submenu-active-bg)' : 'transparent',
-                                color: active ? 'var(--submenu-active)' : 'var(--submenu-item)',
-                                fontWeight: active ? 600 : 400,
-                            }}
-                            onClick={() => navigate(item.path)}
-                            onMouseEnter={e => { if (!active) e.currentTarget.style.background = '#f5f5f5'; }}
-                            onMouseLeave={e => { if (!active) e.currentTarget.style.background = active ? 'var(--submenu-active-bg)' : 'transparent'; }}
-                        >
-                            {item.label}
-                        </div>
-                    );
-                })}
+                {boardOpen &&
+                    items.map((item) => {
+                        const active = currentPath === item.path;
+                        return (
+                            <div
+                                key={item.path}
+                                style={{
+                                    ...menuItemStyle,
+                                    background: active ? 'var(--submenu-active-bg)' : 'transparent',
+                                    color: active ? 'var(--submenu-active)' : 'var(--submenu-item)',
+                                    fontWeight: active ? 600 : 400,
+                                }}
+                                onClick={() => navigate(item.path)}
+                                onMouseEnter={(e) => {
+                                    if (!active) e.currentTarget.style.background = '#f5f5f5';
+                                }}
+                                onMouseLeave={(e) => {
+                                    if (!active) e.currentTarget.style.background = active ? 'var(--submenu-active-bg)' : 'transparent';
+                                }}
+                            >
+                                {item.label}
+                            </div>
+                        );
+                    })}
             </div>
         </div>
     );

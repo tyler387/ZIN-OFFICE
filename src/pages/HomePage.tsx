@@ -1,39 +1,42 @@
 import React, { useState } from 'react';
-import { Card, List, Tag, Avatar } from 'antd';
+import { Avatar, Card, List, Tag } from 'antd';
 import {
+    CalendarOutlined,
+    ClockCircleOutlined,
     FileTextOutlined,
+    LeftOutlined,
     MailOutlined,
     ReadOutlined,
-    UserOutlined,
-    ClockCircleOutlined,
-    LeftOutlined,
     RightOutlined,
-    CalendarOutlined,
+    UserOutlined,
 } from '@ant-design/icons';
+import { useResponsive } from '../hooks/useResponsive';
 
-/* ─── 더미 데이터 ─── */
 const recentPosts = [
-    { key: '1', title: '[공지] 2026년 3월 정기점검 안내', author: '관리자', date: '03-05', board: '공지' },
-    { key: '2', title: '[공지] 사내 보안 교육 필수 이수 안내', author: '보안팀', date: '03-04', board: '공지' },
-    { key: '3', title: '금요일 회식 참석 여부 확인', author: '김철수', date: '03-04', board: '자유' },
-    { key: '4', title: '사내 동호회 모집합니다', author: '이영희', date: '03-03', board: '자유' },
-    { key: '5', title: 'VPN 연결 관련 문의드립니다', author: '박민수', date: '03-02', board: 'Q&A' },
+    { key: '1', title: '3월 정기 점검 안내', author: '관리자', date: '03-05', board: '공지' },
+    { key: '2', title: '보안 교육 이수 안내', author: '보안팀', date: '03-04', board: '공지' },
+    { key: '3', title: '점심 모임 참석 조사', author: '김대리', date: '03-04', board: '자유' },
+    { key: '4', title: '동호회 신규 회원 모집', author: '이사원', date: '03-03', board: '자유' },
 ];
 
 const recentMails = [
-    { key: '1', from: '김철수', subject: '프로젝트 일정 관련 회의', time: '10:32', unread: true },
-    { key: '2', from: '이영희', subject: '주간 보고서 검토 요청', time: '09:15', unread: true },
-    { key: '3', from: '박민수', subject: 'Re: 서버 증설 요청 건', time: '어제', unread: false },
-    { key: '4', from: '최지연', subject: '외부 교육 신청서 확인', time: '어제', unread: false },
-    { key: '5', from: '강서연', subject: '디자인 시안 공유', time: '03/03', unread: false },
+    { key: '1', from: '김대리', subject: '프로젝트 회의 일정 요청', time: '10:32', unread: true },
+    { key: '2', from: '이과장', subject: '주간 보고서 검토 요청', time: '09:15', unread: true },
+    { key: '3', from: '박주임', subject: 'RE: 서버 증설 요청', time: '어제', unread: false },
+    { key: '4', from: '최사원', subject: '교육 신청 확인', time: '어제', unread: false },
 ];
 
 const pendingApprovals = [
-    { key: '1', id: 'AP-001', title: '출장 경비 신청', author: '김철수', status: '진행', date: '03-05' },
-    { key: '2', id: 'AP-002', title: '연차 휴가 신청', author: '이영희', status: '진행', date: '03-04' },
-    { key: '3', id: 'AP-003', title: '물품 구매 요청서', author: '박민수', status: '진행', date: '03-04' },
-    { key: '4', id: 'AP-006', title: '외부 교육 신청', author: '강서연', status: '진행', date: '03-02' },
-    { key: '5', id: 'AP-008', title: '서버 증설 요청', author: '김철수', status: '진행', date: '02-28' },
+    { key: '1', id: 'AP-001', title: '출장 경비 신청', author: '김대리', date: '03-05' },
+    { key: '2', id: 'AP-002', title: '예산 증액 요청', author: '이과장', date: '03-04' },
+    { key: '3', id: 'AP-003', title: '비품 구매 요청', author: '박주임', date: '03-04' },
+];
+
+const scheduleEvents = [
+    { date: 5, title: '주간 회의', time: '10:00 - 11:00', color: '#00897B' },
+    { date: 7, title: '중간 점검 회의', time: '14:00 - 15:30', color: '#1677FF' },
+    { date: 12, title: '전사 미팅', time: '16:00 - 17:00', color: '#722ED1' },
+    { date: 20, title: '분기 보고', time: '09:00 - 10:00', color: '#FAAD14' },
 ];
 
 const sectionHeaderStyle: React.CSSProperties = {
@@ -47,27 +50,21 @@ const sectionHeaderStyle: React.CSSProperties = {
 };
 
 const HomePage: React.FC = () => {
-    return (
-        <div style={{ display: 'flex', gap: 16, height: '100%' }}>
-            {/* ═══ 3/4 영역: 세로 3등분 ═══ */}
-            <div style={{ flex: 4, display: 'flex', flexDirection: 'column', gap: 16, minWidth: 0, overflow: 'hidden' }}>
+    const { isMobile, isTablet } = useResponsive();
 
-                {/* ─── 게시판 최근 글 ─── */}
-                <Card
-                    style={{ flex: 1, borderRadius: 8, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
-                    styles={{ body: { flex: 1, padding: '16px 20px', overflow: 'auto', display: 'flex', flexDirection: 'column' } }}
-                >
+    return (
+        <div style={{ display: 'flex', flexDirection: isTablet ? 'column' : 'row', gap: 16, height: isTablet ? 'auto' : '100%', paddingBottom: isTablet ? 8 : 0 }}>
+            <div style={{ flex: isTablet ? 'none' : 4, display: 'flex', flexDirection: 'column', gap: 16, minWidth: 0 }}>
+                <Card style={{ borderRadius: 8 }} styles={{ body: { padding: isMobile ? '14px' : '16px 20px' } }}>
                     <div style={sectionHeaderStyle}>
                         <ReadOutlined style={{ color: 'var(--primary)' }} />
-                        게시판 최근 글
+                        최근 게시글
                     </div>
                     <List
                         dataSource={recentPosts}
                         split={false}
                         renderItem={(item) => (
-                            <List.Item
-                                style={{ padding: '8px 0', cursor: 'pointer', border: 'none' }}
-                            >
+                            <List.Item style={{ padding: '8px 0', border: 'none' }}>
                                 <div style={{ width: '100%', minWidth: 0 }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
                                         <Tag
@@ -76,20 +73,20 @@ const HomePage: React.FC = () => {
                                                 padding: '0 4px',
                                                 lineHeight: '18px',
                                                 borderRadius: 3,
-                                                background: item.board === '공지' ? '#FFF7E6' : '#F0FAF8',
-                                                color: item.board === '공지' ? '#D48806' : 'var(--primary)',
+                                                background: item.board === 'Notice' ? '#FFF7E6' : '#F0FAF8',
+                                                color: item.board === 'Notice' ? '#D48806' : 'var(--primary)',
                                                 border: 'none',
                                                 flexShrink: 0,
                                             }}
                                         >
                                             {item.board}
                                         </Tag>
-                                        <span style={{ fontSize: 13, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                        <span style={{ fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                             {item.title}
                                         </span>
                                     </div>
                                     <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                                        {item.author} · {item.date}
+                                        {item.author} / {item.date}
                                     </div>
                                 </div>
                             </List.Item>
@@ -97,20 +94,16 @@ const HomePage: React.FC = () => {
                     />
                 </Card>
 
-                {/* ─── 메일함 ─── */}
-                <Card
-                    style={{ flex: 1, borderRadius: 8, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
-                    styles={{ body: { flex: 1, padding: '16px 20px', overflow: 'auto', display: 'flex', flexDirection: 'column' } }}
-                >
+                <Card style={{ borderRadius: 8 }} styles={{ body: { padding: isMobile ? '14px' : '16px 20px' } }}>
                     <div style={sectionHeaderStyle}>
                         <MailOutlined style={{ color: 'var(--primary)' }} />
-                        메일함
+                        최근 메일
                     </div>
                     <List
                         dataSource={recentMails}
                         split={false}
                         renderItem={(item) => (
-                            <List.Item style={{ padding: '8px 0', cursor: 'pointer', border: 'none' }}>
+                            <List.Item style={{ padding: '8px 0', border: 'none' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', minWidth: 0 }}>
                                     <Avatar
                                         size={30}
@@ -118,8 +111,16 @@ const HomePage: React.FC = () => {
                                         style={{ background: item.unread ? 'var(--primary)' : '#d9d9d9', flexShrink: 0 }}
                                     />
                                     <div style={{ flex: 1, minWidth: 0 }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                            <span style={{ fontSize: 13, fontWeight: item.unread ? 600 : 400, color: 'var(--text-primary)' }}>
+                                        <div
+                                            style={{
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                                alignItems: isMobile ? 'flex-start' : 'center',
+                                                flexDirection: isMobile ? 'column' : 'row',
+                                                gap: isMobile ? 2 : 0,
+                                            }}
+                                        >
+                                            <span style={{ fontSize: 13, fontWeight: item.unread ? 600 : 400 }}>
                                                 {item.from}
                                             </span>
                                             <span style={{ fontSize: 11, color: 'var(--text-muted)', flexShrink: 0 }}>{item.time}</span>
@@ -134,29 +135,25 @@ const HomePage: React.FC = () => {
                     />
                 </Card>
 
-                {/* ─── 결재 대기 문서 ─── */}
-                <Card
-                    style={{ flex: 1, borderRadius: 8, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
-                    styles={{ body: { flex: 1, padding: '16px 20px', overflow: 'auto', display: 'flex', flexDirection: 'column' } }}
-                >
+                <Card style={{ borderRadius: 8 }} styles={{ body: { padding: isMobile ? '14px' : '16px 20px' } }}>
                     <div style={sectionHeaderStyle}>
                         <FileTextOutlined style={{ color: 'var(--primary)' }} />
-                        결재 대기 문서
+                        대기 중인 결재
                     </div>
                     <List
                         dataSource={pendingApprovals}
                         split={false}
                         renderItem={(item) => (
-                            <List.Item style={{ padding: '8px 0', cursor: 'pointer', border: 'none' }}>
+                            <List.Item style={{ padding: '8px 0', border: 'none' }}>
                                 <div style={{ width: '100%', minWidth: 0 }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
                                         <ClockCircleOutlined style={{ fontSize: 12, color: '#1677FF' }} />
-                                        <span style={{ fontSize: 13, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                        <span style={{ fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                             {item.title}
                                         </span>
                                     </div>
                                     <div style={{ fontSize: 11, color: 'var(--text-muted)', paddingLeft: 18 }}>
-                                        {item.author} · {item.date} · {item.id}
+                                        {item.author} / {item.date} / {item.id}
                                     </div>
                                 </div>
                             </List.Item>
@@ -165,26 +162,14 @@ const HomePage: React.FC = () => {
                 </Card>
             </div>
 
-            {/* ═══ 나머지 1/4 — 캘린더 위젯 ═══ */}
-            <div style={{ flex: 1, minWidth: 240, display: 'flex', flexDirection: 'column', gap: 16 }}>
-                <CalendarWidget />
+            <div style={{ flex: isTablet ? 'none' : 1, minWidth: isTablet ? 0 : 280, display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <CalendarWidget isMobile={isMobile} />
             </div>
         </div>
     );
 };
 
-/* ═══ 캘린더 위젯 ═══ */
-const scheduleEvents = [
-    { date: 5, title: '주간 팀 미팅', time: '10:00 - 11:00', color: '#00897B' },
-    { date: 7, title: '프로젝트 중간 점검', time: '14:00 - 15:30', color: '#1677FF' },
-    { date: 12, title: '전사 타운홀 미팅', time: '16:00 - 17:00', color: '#722ED1' },
-    { date: 15, title: '정기 점검 (서비스 중단)', time: '02:00 - 06:00', color: '#FF4D4F' },
-    { date: 20, title: '분기 실적 보고', time: '09:00 - 10:00', color: '#FAAD14' },
-];
-
-const eventDates = new Set(scheduleEvents.map(e => e.date));
-
-const CalendarWidget: React.FC = () => {
+const CalendarWidget: React.FC<{ isMobile: boolean }> = ({ isMobile }) => {
     const today = new Date();
     const [viewYear, setViewYear] = useState(today.getFullYear());
     const [viewMonth, setViewMonth] = useState(today.getMonth());
@@ -192,19 +177,30 @@ const CalendarWidget: React.FC = () => {
     const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
     const firstDayOfWeek = new Date(viewYear, viewMonth, 1).getDay();
     const dayLabels = ['일', '월', '화', '수', '목', '금', '토'];
-    const monthLabel = `${viewYear}년 ${viewMonth + 1}월`;
+    const monthLabel = `${viewYear}.${String(viewMonth + 1).padStart(2, '0')}`;
+    const eventDates = new Set(scheduleEvents.map((event) => event.date));
 
     const isToday = (day: number) =>
         viewYear === today.getFullYear() && viewMonth === today.getMonth() && day === today.getDate();
 
     const prevMonth = () => {
-        if (viewMonth === 0) { setViewYear(y => y - 1); setViewMonth(11); }
-        else setViewMonth(m => m - 1);
+        if (viewMonth === 0) {
+            setViewYear((year) => year - 1);
+            setViewMonth(11);
+            return;
+        }
+
+        setViewMonth((month) => month - 1);
     };
 
     const nextMonth = () => {
-        if (viewMonth === 11) { setViewYear(y => y + 1); setViewMonth(0); }
-        else setViewMonth(m => m + 1);
+        if (viewMonth === 11) {
+            setViewYear((year) => year + 1);
+            setViewMonth(0);
+            return;
+        }
+
+        setViewMonth((month) => month + 1);
     };
 
     const goToday = () => {
@@ -212,85 +208,59 @@ const CalendarWidget: React.FC = () => {
         setViewMonth(today.getMonth());
     };
 
-    // 현재 월 일정만 필터
-    const currentMonthEvents = (viewYear === today.getFullYear() && viewMonth === today.getMonth())
-        ? scheduleEvents.filter(e => e.date >= today.getDate()).slice(0, 4)
-        : scheduleEvents.slice(0, 4);
-
-    // 날짜 셀 배열
-    const cells: (number | null)[] = [];
-    for (let i = 0; i < firstDayOfWeek; i++) cells.push(null);
-    for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+    const cells: Array<number | null> = [];
+    for (let index = 0; index < firstDayOfWeek; index += 1) cells.push(null);
+    for (let day = 1; day <= daysInMonth; day += 1) cells.push(day);
     while (cells.length % 7 !== 0) cells.push(null);
 
     return (
-        <Card
-            style={{ borderRadius: 8, flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
-            styles={{ body: { flex: 1, padding: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' } }}
-        >
-            {/* 헤더: 월 네비게이션 */}
-            <div
-                style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '14px 16px 10px',
-                }}
-            >
+        <Card style={{ borderRadius: 8 }} styles={{ body: { padding: 0, overflow: 'hidden' } }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px 10px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <CalendarOutlined style={{ color: 'var(--primary)', fontSize: 15 }} />
-                    <span style={{ fontWeight: 600, fontSize: 14, color: 'var(--text-primary)' }}>{monthLabel}</span>
+                    <span style={{ fontWeight: 600, fontSize: 14 }}>{monthLabel}</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <div onClick={prevMonth} style={navBtnStyle}><LeftOutlined style={{ fontSize: 11 }} /></div>
-                    <div onClick={goToday} style={{ ...navBtnStyle, fontSize: 11, padding: '2px 8px', borderRadius: 4, whiteSpace: 'nowrap', width: 'auto' }}>오늘</div>
+                    <div onClick={goToday} style={{ ...navBtnStyle, width: 'auto', padding: '2px 8px', borderRadius: 4 }}>오늘</div>
                     <div onClick={nextMonth} style={navBtnStyle}><RightOutlined style={{ fontSize: 11 }} /></div>
                 </div>
             </div>
 
-            {/* 요일 헤더 */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', padding: '0 12px 6px', gap: 0 }}>
-                {dayLabels.map((d, i) => (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', padding: '0 12px 6px' }}>
+                {dayLabels.map((label, index) => (
                     <div
-                        key={d}
+                        key={label}
                         style={{
                             textAlign: 'center',
                             fontSize: 11,
                             fontWeight: 500,
-                            color: i === 0 ? '#FF4D4F' : i === 6 ? '#1677FF' : 'var(--text-muted)',
+                            color: index === 0 ? '#FF4D4F' : index === 6 ? '#1677FF' : 'var(--text-muted)',
                             padding: '2px 0',
                         }}
                     >
-                        {d}
+                        {label}
                     </div>
                 ))}
             </div>
 
-            {/* 날짜 그리드 */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', padding: '0 12px', gap: '1px 0', flex: 1 }}>
-                {cells.map((day, idx) => {
-                    const colIdx = idx % 7;
-                    const isSunday = colIdx === 0;
-                    const isSaturday = colIdx === 6;
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', padding: '0 12px', gap: '1px 0' }}>
+                {cells.map((day, index) => {
+                    const dayOfWeek = index % 7;
                     const hasEvent = day !== null && eventDates.has(day);
                     const todayMatch = day !== null && isToday(day);
 
                     return (
                         <div
-                            key={idx}
+                            key={`${day ?? 'empty'}-${index}`}
                             style={{
                                 display: 'flex',
                                 flexDirection: 'column',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                padding: '3px 0',
-                                cursor: day ? 'pointer' : 'default',
-                                borderRadius: 6,
-                                transition: 'background 0.12s',
-                                position: 'relative',
+                                padding: isMobile ? '6px 0' : '4px 0',
+                                minHeight: isMobile ? 34 : 28,
                             }}
-                            onMouseEnter={e => { if (day && !todayMatch) e.currentTarget.style.background = '#f5f5f5'; }}
-                            onMouseLeave={e => { if (day && !todayMatch) e.currentTarget.style.background = 'transparent'; }}
                         >
                             {day !== null && (
                                 <>
@@ -304,7 +274,7 @@ const CalendarWidget: React.FC = () => {
                                             borderRadius: '50%',
                                             fontSize: 12,
                                             fontWeight: todayMatch ? 700 : 400,
-                                            color: todayMatch ? '#fff' : isSunday ? '#FF4D4F' : isSaturday ? '#1677FF' : 'var(--text-primary)',
+                                            color: todayMatch ? '#fff' : dayOfWeek === 0 ? '#FF4D4F' : dayOfWeek === 6 ? '#1677FF' : 'var(--text-primary)',
                                             background: todayMatch ? 'var(--primary)' : 'transparent',
                                         }}
                                     >
@@ -317,7 +287,7 @@ const CalendarWidget: React.FC = () => {
                                                 height: 4,
                                                 borderRadius: '50%',
                                                 background: todayMatch ? '#fff' : 'var(--primary)',
-                                                marginTop: 1,
+                                                marginTop: 2,
                                             }}
                                         />
                                     )}
@@ -328,44 +298,17 @@ const CalendarWidget: React.FC = () => {
                 })}
             </div>
 
-            {/* 다가오는 일정 */}
-            <div
-                style={{
-                    borderTop: '1px solid var(--border)',
-                    padding: '10px 16px',
-                    overflow: 'auto',
-                }}
-            >
-                <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 8 }}>
-                    다가오는 일정
-                </div>
-                {currentMonthEvents.map((ev, i) => (
-                    <div
-                        key={i}
-                        style={{
-                            display: 'flex',
-                            alignItems: 'flex-start',
-                            gap: 8,
-                            padding: '6px 0',
-                            cursor: 'pointer',
-                        }}
-                    >
-                        <div
-                            style={{
-                                width: 3,
-                                height: 28,
-                                borderRadius: 2,
-                                background: ev.color,
-                                flexShrink: 0,
-                                marginTop: 1,
-                            }}
-                        />
+            <div style={{ borderTop: '1px solid var(--border)', padding: '10px 16px' }}>
+                <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8 }}>예정 일정</div>
+                {scheduleEvents.map((event) => (
+                    <div key={`${event.date}-${event.title}`} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '6px 0' }}>
+                        <div style={{ width: 3, height: 28, borderRadius: 2, background: event.color, flexShrink: 0, marginTop: 1 }} />
                         <div style={{ minWidth: 0 }}>
-                            <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                {ev.title}
+                            <div style={{ fontSize: 12, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {event.title}
                             </div>
                             <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                                {viewMonth + 1}/{ev.date} · {ev.time}
+                                {viewMonth + 1}/{event.date} / {event.time}
                             </div>
                         </div>
                     </div>

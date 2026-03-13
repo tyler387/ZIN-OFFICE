@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, Progress } from 'antd';
 import {
+    DownOutlined,
+    DownloadOutlined,
     EditOutlined,
     MoreOutlined,
     PlusOutlined,
-    TagOutlined,
-    DownloadOutlined,
-    SettingOutlined,
     RightOutlined,
-    DownOutlined,
+    SettingOutlined,
+    TagOutlined,
 } from '@ant-design/icons';
 
 const MailSubMenu: React.FC = () => {
@@ -71,8 +71,15 @@ const MailSubMenu: React.FC = () => {
         userSelect: 'none',
     };
 
-    const MenuItem: React.FC<{ label: string; folder: string; badge?: number; right?: React.ReactNode; indent?: boolean }> = ({ label, folder, badge, right, indent }) => {
+    const MenuItem: React.FC<{
+        label: string;
+        folder: string;
+        badge?: number;
+        right?: React.ReactNode;
+        indent?: boolean;
+    }> = ({ label, folder, badge, right, indent }) => {
         const active = currentFolder === folder;
+
         return (
             <div
                 style={{
@@ -82,9 +89,16 @@ const MailSubMenu: React.FC = () => {
                     color: active ? 'var(--submenu-active)' : 'var(--submenu-item)',
                     fontWeight: active ? 600 : 400,
                 }}
-                onClick={(e) => { e.stopPropagation(); navigate(`/mail/${folder}`); }}
-                onMouseEnter={e => { if (!active) e.currentTarget.style.background = '#f5f5f5'; }}
-                onMouseLeave={e => { if (!active) e.currentTarget.style.background = 'transparent'; }}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/mail/${folder}`);
+                }}
+                onMouseEnter={(e) => {
+                    if (!active) e.currentTarget.style.background = '#f5f5f5';
+                }}
+                onMouseLeave={(e) => {
+                    if (!active) e.currentTarget.style.background = 'transparent';
+                }}
             >
                 <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{label}</span>
                 {badge !== undefined && <span style={badgeStyle}>{badge}</span>}
@@ -102,44 +116,51 @@ const MailSubMenu: React.FC = () => {
             </div>
 
             <div style={{ flex: 1, overflowY: 'auto', paddingBottom: 8 }}>
-                {/* 즐겨찾기 */}
                 <div style={sectionHeaderStyle}>
                     <span style={{ flex: 1 }}>즐겨찾기</span>
                     <EditOutlined style={{ fontSize: 12, color: '#999', cursor: 'pointer' }} />
                 </div>
-                <MenuItem label="중요메일함" folder="important" />
-                <MenuItem label="받은메일함" folder="inbox" badge={33} />
-                <MenuItem label="안읽은메일함" folder="unread" />
-                <MenuItem label="오늘온메일함" folder="today" />
+                <MenuItem label="중요 메일함" folder="important" />
+                <MenuItem label="받은 메일함" folder="inbox" badge={33} />
+                <MenuItem label="읽지 않은 메일" folder="unread" />
+                <MenuItem label="오늘 온 메일함" folder="today" />
 
-                {/* 메일함 */}
                 <div style={sectionHeaderStyle} onClick={() => setMailboxOpen(!mailboxOpen)}>
                     {mailboxOpen ? <DownOutlined style={{ fontSize: 9, marginRight: 4 }} /> : <RightOutlined style={{ fontSize: 9, marginRight: 4 }} />}
                     <span style={{ flex: 1 }}>메일함</span>
                 </div>
                 {mailboxOpen && (
                     <>
-                        <MenuItem label="받은메일함" folder="inbox" badge={33} right={<MoreOutlined style={{ fontSize: 14, color: '#999', cursor: 'pointer', marginLeft: 4 }} />} />
-                        <MenuItem label="보관 메일함" folder="archive" right={<MoreOutlined style={{ fontSize: 14, color: '#999', cursor: 'pointer', marginLeft: 'auto' }} />} />
-                        <MenuItem label="보낸메일함" folder="sent" right={<span style={smallBtnStyle}>수신확인</span>} />
+                        <MenuItem
+                            label="받은 메일함"
+                            folder="inbox"
+                            badge={33}
+                            right={<MoreOutlined style={{ fontSize: 14, color: '#999', cursor: 'pointer', marginLeft: 4 }} />}
+                        />
+                        <MenuItem
+                            label="보관 메일함"
+                            folder="archive"
+                            right={<MoreOutlined style={{ fontSize: 14, color: '#999', cursor: 'pointer', marginLeft: 'auto' }} />}
+                        />
+                        <MenuItem label="보낸 메일함" folder="sent" right={<span style={smallBtnStyle}>수신확인</span>} />
                         <MenuItem label="임시보관함" folder="draft" />
-                        <MenuItem label="예약메일함" folder="scheduled" />
-                        <MenuItem label="스팸메일함" folder="spam" right={<span style={smallBtnStyle}>비우기</span>} />
+                        <MenuItem label="예약 메일함" folder="scheduled" />
+                        <MenuItem label="스팸 메일함" folder="spam" right={<span style={smallBtnStyle}>비우기</span>} />
                         <MenuItem label="휴지통" folder="trash" badge={578} right={<span style={{ ...smallBtnStyle, marginLeft: 6 }}>비우기</span>} />
                         <MenuItem label="서버 오류 메일함" folder="server-error" />
                         <MenuItem label="서버 오류 메일" folder="server-error-mail" badge={9} indent />
 
                         <div
                             style={{ ...menuItemStyle, color: '#888', fontSize: 12 }}
-                            onMouseEnter={e => (e.currentTarget.style.background = '#f5f5f5')}
-                            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                            onMouseEnter={(e) => (e.currentTarget.style.background = '#f5f5f5')}
+                            onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
                         >
                             메일함 더보기
                         </div>
                         <div
                             style={{ ...menuItemStyle, color: 'var(--primary)', fontSize: 12, gap: 4 }}
-                            onMouseEnter={e => (e.currentTarget.style.background = '#f5f5f5')}
-                            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                            onMouseEnter={(e) => (e.currentTarget.style.background = '#f5f5f5')}
+                            onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
                         >
                             <PlusOutlined style={{ fontSize: 11 }} />
                             메일함 추가
@@ -147,43 +168,39 @@ const MailSubMenu: React.FC = () => {
                     </>
                 )}
 
-                {/* 빠른검색 */}
                 <div style={sectionHeaderStyle} onClick={() => setQuickSearchOpen(!quickSearchOpen)}>
                     {quickSearchOpen ? <DownOutlined style={{ fontSize: 9, marginRight: 4 }} /> : <RightOutlined style={{ fontSize: 9, marginRight: 4 }} />}
-                    <span style={{ flex: 1 }}>빠른검색</span>
+                    <span style={{ flex: 1 }}>빠른 검색</span>
                 </div>
                 {quickSearchOpen && (
                     <>
-                        <MenuItem label="중요메일함" folder="important" />
-                        <MenuItem label="안읽은메일함" folder="unread" />
-                        <MenuItem label="읽은메일함" folder="read" />
-                        <MenuItem label="오늘온메일함" folder="today" />
-                        <MenuItem label="어제온메일함" folder="yesterday" />
-                        <MenuItem label="첨부메일함" folder="attachment" />
-                        <MenuItem label="답장한메일함" folder="replied" />
-                        <MenuItem label="내가쓴메일함" folder="mine" />
+                        <MenuItem label="중요 메일함" folder="important" />
+                        <MenuItem label="읽지 않은 메일" folder="unread" />
+                        <MenuItem label="읽은 메일함" folder="read" />
+                        <MenuItem label="오늘 온 메일함" folder="today" />
+                        <MenuItem label="어제 온 메일함" folder="yesterday" />
+                        <MenuItem label="첨부 메일함" folder="attachment" />
+                        <MenuItem label="답장한 메일함" folder="replied" />
+                        <MenuItem label="내가 쓴 메일함" folder="mine" />
                     </>
                 )}
 
-                {/* 태그 */}
                 <div style={sectionHeaderStyle}>
                     <TagOutlined style={{ fontSize: 11, marginRight: 4 }} />
                     <span style={{ flex: 1 }}>태그</span>
                     <PlusOutlined style={{ fontSize: 11, color: '#999', cursor: 'pointer' }} />
                 </div>
 
-                {/* 외부메일 다운로드 */}
                 <div
                     style={{ ...menuItemStyle, gap: 6 }}
-                    onMouseEnter={e => (e.currentTarget.style.background = '#f5f5f5')}
-                    onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = '#f5f5f5')}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
                 >
                     <DownloadOutlined style={{ fontSize: 13, color: '#888' }} />
-                    외부메일 다운로드
+                    전체 메일 다운로드
                 </div>
             </div>
 
-            {/* 하단 */}
             <div style={{ borderTop: '1px solid var(--submenu-border)', padding: '8px 12px', flexShrink: 0 }}>
                 <div
                     style={{
@@ -196,11 +213,11 @@ const MailSubMenu: React.FC = () => {
                         padding: '4px 0',
                         marginBottom: 8,
                     }}
-                    onMouseEnter={e => (e.currentTarget.style.color = 'var(--primary)')}
-                    onMouseLeave={e => (e.currentTarget.style.color = '#666')}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--primary)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = '#666')}
                 >
                     <SettingOutlined style={{ fontSize: 13 }} />
-                    <span>메일환경설정</span>
+                    <span>메일 환경설정</span>
                 </div>
                 <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4, display: 'flex', justifyContent: 'space-between' }}>
                     <span>사용 중</span>

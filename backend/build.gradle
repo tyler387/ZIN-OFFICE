@@ -8,6 +8,7 @@ import org.gradle.internal.os.OperatingSystem
 
 group = 'com.groupware'
 version = '0.0.1-SNAPSHOT'
+def skipFrontendBuild = project.findProperty('skipFrontendBuild')?.toString()?.toBoolean() ?: false
 
 java {
     toolchain {
@@ -53,6 +54,7 @@ dependencies {
 
 tasks.register('frontendBuild', Exec) {
     workingDir = project.file('..')
+    onlyIf { !skipFrontendBuild }
 
     if (OperatingSystem.current().isWindows()) {
         commandLine 'cmd', '/c', 'npm', 'run', 'build'
@@ -62,7 +64,9 @@ tasks.register('frontendBuild', Exec) {
 }
 
 tasks.named('processResources') {
-    dependsOn tasks.named('frontendBuild')
+    if (!skipFrontendBuild) {
+        dependsOn tasks.named('frontendBuild')
+    }
 }
 
 tasks.named('test') {
