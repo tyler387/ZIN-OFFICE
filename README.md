@@ -28,12 +28,19 @@ React + Vite 프론트엔드와 Spring Boot 백엔드를 하나의 서비스로 
 - Java 17+
 - (Windows) PowerShell 또는 CMD
 
-프로젝트는 Gradle Java 경로를 고정해서 사용합니다:
+프로젝트 레포에는 OS 의존적인 Gradle Java 경로 고정(`org.gradle.java.home`)을 두지 않습니다.
+Render Docker 환경과 충돌할 수 있기 때문입니다.
 
-- `backend/gradle.properties`
-- `org.gradle.java.home=C:/Program Files/Java/jdk-17`
+로컬에서만 Java 17 경로를 강제하고 싶다면 사용자 전역 파일을 사용하세요.
 
-전역 `JAVA_HOME`이 Java 8이어도 이 프로젝트의 Gradle은 Java 17로 동작합니다.
+- Windows: `%USERPROFILE%\.gradle\gradle.properties`
+- macOS/Linux: `~/.gradle/gradle.properties`
+
+예시:
+
+```properties
+org.gradle.java.home=C:/Program Files/Java/jdk-17
+```
 
 ## Local Development
 
@@ -154,10 +161,11 @@ npm run preview
 
 ### Gradle이 Java 8로 실행되는 경우
 
-- `backend/gradle.properties`의 `org.gradle.java.home` 경로가 실제 Java 17 경로인지 확인
+- `java -version` 확인
+- 사용자 전역 `~/.gradle/gradle.properties`에 `org.gradle.java.home` 설정
+- Docker/CI 환경에서는 레포 내부에 OS 절대경로(`C:/...`)를 커밋하지 않기
 
 ### Windows에서 gradlew 실행 오류
 
 - `cd backend` 경로에서 실행했는지 확인
 - `.\gradlew.bat -version`으로 실제 Gradle JVM 버전 확인
-
