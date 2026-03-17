@@ -28,6 +28,44 @@ React + Vite 프론트엔드와 Spring Boot 백엔드를 단일 서비스로 운
 - Java 17 이상
 - (Windows) PowerShell 또는 CMD
 
+## 서버 환경 구분
+
+- 개발 서버: https://zin-office-dev.onrender.com/login
+- 운영 서버: https://zin-office.onrender.com/login
+
+## 로그인 계정 정보(개발/데모)
+
+아래 계정은 `backend/src/main/java/com/groupware/global/config/DataInitializer.java` 기준 기본 시드 계정입니다.
+
+| 구분 | 이메일(ID) | 비밀번호 |
+| --- | --- | --- |
+| 관리자 | `admin@company.com` | `password123` |
+| 개발팀 | `hong@company.com` | `password123` |
+| 개발팀 | `kim@company.com` | `password123` |
+| 개발팀 | `kimj@company.com` | `password123` |
+| 영업팀 | `lee@company.com` | `password123` |
+
+- 운영 서버 계정은 보안 정책에 따라 별도 관리될 수 있습니다.
+
+## Git 브랜치 전략
+
+- 기본 흐름: `feature/<name> -> develop -> main`
+- `main`: 운영 배포 기준
+- `develop`: 기능 통합/검증
+- `feature/*`: 기능 단위 개발
+
+자세한 규칙은 `브랜치_전략_가이드.md`를 확인하세요.
+
+## 협업 참고 문서
+
+- `AI_에이전트_협업_가이드.md`: 바이브 코딩 개발 범위/이슈 대응 가이드
+- `README.md`: 프로젝트 구조/실행/배포 가이드
+- `브랜치_전략_가이드.md`: Git 브랜치 구조/병합 정책
+
+## GitHub 협업 안내
+
+그룹웨어 협업 참여가 필요한 경우 GitHub 계정 이메일을 공유해 주세요. 저장소 초대를 진행합니다.
+
 ## 로컬 실행
 
 ### 1) 프론트 개발 서버
