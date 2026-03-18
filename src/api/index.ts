@@ -1,6 +1,6 @@
 import axios from 'axios';
+import { BYPASS_AUTH } from '../config/auth';
 
-/* ─── Axios 기본 인스턴스 ─── */
 const api = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
     timeout: 15000,
@@ -9,7 +9,6 @@ const api = axios.create({
     },
 });
 
-/* ─── 요청 인터셉터 ─── */
 api.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('accessToken');
@@ -21,13 +20,16 @@ api.interceptors.request.use(
     (error) => Promise.reject(error),
 );
 
-/* ─── 응답 인터셉터 ─── */
 api.interceptors.response.use(
     (response) => response,
     (error) => {
+        if (BYPASS_AUTH) {
+            return Promise.reject(error);
+        }
+
         if (error.response?.status === 401) {
-            // 토큰 만료 시 로그인 페이지로 리다이렉트
             localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
             window.location.href = '/login';
         }
         return Promise.reject(error);

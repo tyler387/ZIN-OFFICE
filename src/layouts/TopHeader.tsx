@@ -10,6 +10,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { authApi } from '../api/authApi';
+import { BYPASS_AUTH, MOCK_USER } from '../config/auth';
 
 interface TopHeaderProps {
     isMobile?: boolean;
@@ -18,9 +19,17 @@ interface TopHeaderProps {
 
 const TopHeader: React.FC<TopHeaderProps> = ({ isMobile = false, onMenuClick }) => {
     const navigate = useNavigate();
-    const { user, logout } = useAuthStore();
+    const { user, logout, setUser } = useAuthStore();
 
     const handleLogout = async () => {
+        if (BYPASS_AUTH) {
+            logout();
+            setUser(MOCK_USER);
+            message.info('인증 우회 모드: 테스트 사용자로 유지됩니다.');
+            navigate('/home');
+            return;
+        }
+
         try {
             await authApi.logout();
             logout();

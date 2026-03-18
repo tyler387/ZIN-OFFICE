@@ -23,6 +23,7 @@ import CommunityPage from './pages/CommunityPage';
 import { authApi } from './api/authApi';
 import { useAuthStore } from './store/authStore';
 import { Spin } from 'antd';
+import { BYPASS_AUTH, MOCK_USER } from './config/auth';
 
 const App: React.FC = () => {
   const setUser = useAuthStore((state) => state.setUser);
@@ -32,6 +33,15 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const initAuth = async () => {
+      if (BYPASS_AUTH) {
+        setUser(MOCK_USER);
+        if (location.pathname === '/login') {
+          navigate('/home', { replace: true });
+        }
+        setIsInitializing(false);
+        return;
+      }
+
       const token = localStorage.getItem('accessToken');
       if (token) {
         try {
@@ -58,7 +68,7 @@ const App: React.FC = () => {
     };
 
     initAuth();
-  }, [setUser, navigate]);
+  }, [setUser, navigate, location.pathname]);
 
   if (isInitializing) {
     return (
