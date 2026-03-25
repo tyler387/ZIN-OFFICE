@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -26,12 +27,8 @@ public class AttendanceService {
     private final AttendanceRepository attendanceRepository;
     private final UserRepository userRepository;
 
-    // 출근 기준 시간: 오전 9시
     private static final LocalTime ON_TIME_LIMIT = LocalTime.of(9, 0);
 
-    /**
-     * 출근 처리
-     */
     @Transactional
     public AttendanceDto clockIn(Long userId) {
         User user = userRepository.findById(userId)
@@ -43,15 +40,14 @@ public class AttendanceService {
         }
 
         LocalDate today = KoreaTime.nowDate();
-        
-        // 이미 출근 기록이 있는지 확인
         if (attendanceRepository.findByUserIdAndWorkDate(userId, today).isPresent()) {
-            throw new CustomException(ErrorCode.INVALID_INPUT, "이미 출근 처리가 되었습니다.");
+            throw new CustomException(ErrorCode.INVALID_INPUT, "이미 출근 처리되었습니다.");
         }
 
         LocalDateTime now = KoreaTime.nowDateTime();
-        AttendanceStatus status = now.toLocalTime().isAfter(ON_TIME_LIMIT) ? 
-                AttendanceStatus.LATE : AttendanceStatus.PRESENT;
+        AttendanceStatus status = now.toLocalTime().isAfter(ON_TIME_LIMIT)
+                ? AttendanceStatus.LATE
+                : AttendanceStatus.PRESENT;
 
         Attendance attendance = Attendance.builder()
                 .employee(employee)
@@ -64,32 +60,39 @@ public class AttendanceService {
         return AttendanceDto.from(saved);
     }
 
-    /**
-     * 퇴근 처리
-     */
     @Transactional
     public AttendanceDto clockOut(Long userId) {
         LocalDate today = KoreaTime.nowDate();
-        
+
         Attendance attendance = attendanceRepository.findByUserIdAndWorkDate(userId, today)
-                .orElseThrow(() -> new CustomException(ErrorCode.INVALID_INPUT, "오늘의 출근 기록이 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.INVALID_INPUT, "오늘 출근 기록이 없습니다."));
 
         if (attendance.getClockOutTime() != null) {
-            throw new CustomException(ErrorCode.INVALID_INPUT, "이미 퇴근 처리가 되었습니다.");
+            throw new CustomException(ErrorCode.INVALID_INPUT, "이미 퇴근 처리되었습니다.");
         }
 
         attendance.clockOut(KoreaTime.nowDateTime());
-        // Dirty checking에 의해 자동 update 됨
         return AttendanceDto.from(attendance);
     }
 
-    /**
-     * 오늘의 내 근태 기록 조회
-     */
     public AttendanceDto getTodayAttendance(Long userId) {
         LocalDate today = KoreaTime.nowDate();
         return attendanceRepository.findByUserIdAndWorkDate(userId, today)
                 .map(AttendanceDto::from)
-                .orElse(null); // 기록이 없으면 null 반환
+                .orElse(null);
+    }
+
+    public List<AttendanceDto> getMonthlyAttendance(Long userId, int year, int month) {
+        if (month < 1 || month > 12) {
+            throw new CustomException(ErrorCode.INVALID_INPUT, "월(month)은 1~12 범위여야 합니다.");
+        }
+
+        LocalDate startDate = LocalDate.of(year, month, 1);
+        LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
+
+        return attendanceRepository.findByUserIdAndWorkDateBetween(userId, startDate, endDate)
+                .stream()
+                .map(AttendanceDto::from)
+                .toList();
     }
 }

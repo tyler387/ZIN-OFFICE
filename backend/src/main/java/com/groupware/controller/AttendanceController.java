@@ -9,7 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/attendance")
@@ -25,30 +28,21 @@ public class AttendanceController {
             String token = bearerToken.substring(7);
             return jwtTokenProvider.getUserIdFromToken(token);
         }
-        return null; // 예외 처리는 필터 등에서 이미 됨
+        return null;
     }
 
-    /**
-     * 출근 기록
-     */
     @PostMapping("/clock-in")
     public ResponseEntity<AttendanceDto> clockIn(HttpServletRequest request) {
         Long userId = getUserIdFromRequest(request);
         return ResponseEntity.ok(attendanceService.clockIn(userId));
     }
 
-    /**
-     * 퇴근 기록
-     */
     @PostMapping("/clock-out")
     public ResponseEntity<AttendanceDto> clockOut(HttpServletRequest request) {
         Long userId = getUserIdFromRequest(request);
         return ResponseEntity.ok(attendanceService.clockOut(userId));
     }
 
-    /**
-     * 오늘의 내 출퇴근 기록 조회
-     */
     @GetMapping("/today")
     public ResponseEntity<AttendanceDto> getTodayAttendance(HttpServletRequest request) {
         Long userId = getUserIdFromRequest(request);
@@ -57,5 +51,15 @@ public class AttendanceController {
             return ResponseEntity.ok(dto);
         }
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/month")
+    public ResponseEntity<List<AttendanceDto>> getMonthlyAttendance(
+            HttpServletRequest request,
+            @RequestParam int year,
+            @RequestParam int month
+    ) {
+        Long userId = getUserIdFromRequest(request);
+        return ResponseEntity.ok(attendanceService.getMonthlyAttendance(userId, year, month));
     }
 }

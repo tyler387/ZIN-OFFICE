@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Button, Avatar, Tag, message } from 'antd';
 import {
     UserOutlined,
@@ -10,12 +10,15 @@ import {
     ClockCircleOutlined,
 } from '@ant-design/icons';
 import { useAuthStore } from '../../store/authStore';
-import { attendanceApi, type AttendanceDto } from '../../api/attendanceApi';
+import { useAttendanceStore } from '../../store/attendanceStore';
 
 const HomeSubMenu: React.FC = () => {
     const { user } = useAuthStore();
-    const [attendance, setAttendance] = useState<AttendanceDto | null>(null);
-    const [loading, setLoading] = useState(true);
+    const attendance = useAttendanceStore((state) => state.todayAttendance);
+    const loading = useAttendanceStore((state) => state.loadingToday);
+    const fetchTodayAttendance = useAttendanceStore((state) => state.fetchTodayAttendance);
+    const clockIn = useAttendanceStore((state) => state.clockIn);
+    const clockOut = useAttendanceStore((state) => state.clockOut);
 
     const now = new Date();
     const todayStr = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`;
@@ -23,21 +26,10 @@ const HomeSubMenu: React.FC = () => {
     const dayStr = dayNames[now.getDay()];
 
     useEffect(() => {
-        const fetchAttendance = async () => {
-            try {
-                const res = await attendanceApi.getTodayAttendance();
-                // 204 No Content means no record for today
-                if (res.data) {
-                    setAttendance(res.data);
-                }
-            } catch (err) {
-                console.error("Failed to fetch today's attendance:", err);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchAttendance();
-    }, []);
+        fetchTodayAttendance().catch((err) => {
+            console.error("Failed to fetch today's attendance:", err);
+        });
+    }, [fetchTodayAttendance]);
 
     const formatTime = (dateString?: string | null) => {
         if (!dateString) return '--:--';
@@ -47,8 +39,7 @@ const HomeSubMenu: React.FC = () => {
 
     const handleClockIn = async () => {
         try {
-            const res = await attendanceApi.clockIn();
-            setAttendance(res.data);
+            await clockIn();
             message.success('출근 처리되었습니다.');
         } catch (err: any) {
             message.error(err.response?.data?.message || '출근 처리에 실패했습니다.');
@@ -57,8 +48,7 @@ const HomeSubMenu: React.FC = () => {
 
     const handleClockOut = async () => {
         try {
-            const res = await attendanceApi.clockOut();
-            setAttendance(res.data);
+            await clockOut();
             message.success('퇴근 처리되었습니다.');
         } catch (err: any) {
             message.error(err.response?.data?.message || '퇴근 처리에 실패했습니다.');
@@ -67,7 +57,6 @@ const HomeSubMenu: React.FC = () => {
 
     return (
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', padding: 12 }}>
-            {/* ─── 직원 프로필 ─── */}
             <div
                 style={{
                     flex: 1,
@@ -135,33 +124,8 @@ const HomeSubMenu: React.FC = () => {
                         </div>
                     )}
                 </div>
-
-                {/* ─── 새 소식 요약 ─── */}
-                <div
-                    style={{
-                        marginTop: 16,
-                        width: '100%',
-                        display: 'flex',
-                        justifyContent: 'space-around',
-                        background: '#FAFAFA',
-                        padding: '12px 0',
-                        borderRadius: 8,
-                        border: '1px solid var(--border)',
-                    }}
-                >
-                    <div style={{ textAlign: 'center', flex: 1 }}>
-                        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4 }}>오늘 온 메일</div>
-                        <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--primary)' }}>3개</div>
-                    </div>
-                    <div style={{ width: 1, background: 'var(--border)' }} />
-                    <div style={{ textAlign: 'center', flex: 1 }}>
-                        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4 }}>오늘의 일정</div>
-                        <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--primary)' }}>2개</div>
-                    </div>
-                </div>
             </div>
 
-            {/* ─── 근태관리 ─── */}
             <div style={{ flex: 1, borderTop: '1px solid var(--border)', paddingTop: 18, display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', overflow: 'auto' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 14 }}>
                     <ClockCircleOutlined style={{ color: 'var(--primary)', fontSize: 16 }} />

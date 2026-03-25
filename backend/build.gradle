@@ -27,15 +27,15 @@ repositories {
 }
 
 dependencies {
-    // Spring Boot 스타터
+    // Spring Boot ?????
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
-    // H2 데이터베이스 (개발/테스트용)
-    runtimeOnly 'com.h2database:h2'
+    // PostgreSQL database
+    runtimeOnly 'org.postgresql:postgresql'
 
     // JWT (jjwt 0.12.x)
     implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
@@ -46,7 +46,7 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
-    // 테스트
+    // ???뮞??
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -72,3 +72,4 @@ tasks.named('processResources') {
 tasks.named('test') {
     useJUnitPlatform()
 }
+

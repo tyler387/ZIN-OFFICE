@@ -1,10 +1,8 @@
 import type { UserDto } from '../api/authApi';
 
-// In dev server, always bypass auth for local testing.
-// In non-dev builds, only bypass when explicitly enabled.
-export const BYPASS_AUTH = import.meta.env.DEV
-  ? true
-  : import.meta.env.VITE_BYPASS_AUTH === 'true';
+// Auth bypass is disabled by default.
+// Enable only when VITE_BYPASS_AUTH=true is explicitly set.
+export const BYPASS_AUTH = import.meta.env.VITE_BYPASS_AUTH === 'true';
 
 export const MOCK_USER: UserDto = {
   id: 4,
