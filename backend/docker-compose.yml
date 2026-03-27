@@ -1,0 +1,15 @@
+services:
+  backend:
+    image: groupware-backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: groupware-backend
+    env_file:
+      - .env
+    environment:
+      PORT: 8080
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
