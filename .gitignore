@@ -61,3 +61,6 @@ HELP.md
 # Uploads directory
 /backend/uploads/
 /uploads/
+
+# Local environment secrets
+/backend/.env

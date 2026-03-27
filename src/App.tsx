@@ -81,7 +81,7 @@ const App: React.FC = () => {
   return (
     <Routes>
       {/* Login - standalone page without AppLayout */}
-      <Route path="/login" element={<LoginPage />} />
+      <Route path="/login" element={BYPASS_AUTH ? <Navigate to="/home" replace /> : <LoginPage />} />
 
       {/* Main app with AppLayout */}
       <Route path="/" element={<AppLayout />}>

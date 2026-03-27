@@ -1,21 +1,22 @@
 import type { UserDto } from '../api/authApi';
 
-// Temporary default for local testing: auth is bypassed unless explicitly disabled.
-export const BYPASS_AUTH = import.meta.env.VITE_BYPASS_AUTH !== 'false';
+// Auth bypass is disabled by default.
+// Enable only when VITE_BYPASS_AUTH=true is explicitly set.
+export const BYPASS_AUTH = import.meta.env.VITE_BYPASS_AUTH === 'true';
 
 export const MOCK_USER: UserDto = {
-  id: 999999,
+  id: 4,
   email: 'kimj@company.com',
-  name: 'Kim J',
+  name: '김진환',
   role: 'USER',
   employee: {
-    id: 999999,
-    position: 'Tester',
-    phone: '010-0000-0000',
-    officeLocation: 'Test Lab',
+    id: 4,
+    position: '사원',
+    phone: '010-0000-0004',
+    officeLocation: '본사 9층',
     department: {
-      id: 1,
-      name: 'QA',
+      id: 2,
+      name: '개발팀',
     },
   },
 };

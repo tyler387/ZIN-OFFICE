@@ -29,8 +29,10 @@ public class AuthService {
      */
     @Transactional(readOnly = true)
     public AuthResponse login(LoginRequest request) {
+        String normalizedEmail = request.getEmail() == null ? "" : request.getEmail().trim().toLowerCase();
+
         // 1. 유저 조회
-        User user = userRepository.findByEmail(request.getEmail())
+        User user = userRepository.findByEmail(normalizedEmail)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND, "가입되지 않은 이메일입니다."));
 
         // 2. 비밀번호 검증
@@ -87,7 +89,8 @@ public class AuthService {
      */
     @Transactional(readOnly = true)
     public UserDto getMe(String email) {
-        User user = userRepository.findByEmail(email)
+        String normalizedEmail = email == null ? "" : email.trim().toLowerCase();
+        User user = userRepository.findByEmail(normalizedEmail)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
                 
         return UserDto.from(user);
