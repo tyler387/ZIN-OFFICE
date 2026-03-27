@@ -38,33 +38,25 @@ for %%i in ("%APP_HOME%") do set APP_HOME=%%~fi
 @rem Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
 set DEFAULT_JVM_OPTS="-Xmx64m" "-Xms64m"
 
-@rem Find java.exe
-if defined JAVA_HOME goto findJavaFromJavaHome
+@rem Find Java 17 without requiring JAVA_HOME/PATH.
+@rem 1) Prefer project-local JDK: backend\.jdk\bin\java.exe
+set "JAVA_EXE="
+if exist "%APP_HOME%\.jdk\bin\java.exe" set "JAVA_EXE=%APP_HOME%\.jdk\bin\java.exe"
+if defined JAVA_EXE goto execute
 
-set JAVA_EXE=java.exe
-%JAVA_EXE% -version >NUL 2>&1
-if %ERRORLEVEL% equ 0 goto execute
-
-echo. 1>&2
-echo ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH. 1>&2
-echo. 1>&2
-echo Please set the JAVA_HOME variable in your environment to match the 1>&2
-echo location of your Java installation. 1>&2
-
-goto fail
-
-:findJavaFromJavaHome
-set JAVA_HOME=%JAVA_HOME:"=%
-set JAVA_EXE=%JAVA_HOME%/bin/java.exe
-
-if exist "%JAVA_EXE%" goto execute
+@rem 2) Try common Windows JDK install locations.
+for /d %%D in ("%ProgramFiles%\Eclipse Adoptium\jdk-17*" "%ProgramFiles%\Java\jdk-17*" "%ProgramFiles%\Microsoft\jdk-17*" "%ProgramFiles%\Amazon Corretto\jdk17*" "%ProgramFiles%\Zulu\zulu-17*") do (
+  if exist "%%~fD\bin\java.exe" (
+    set "JAVA_EXE=%%~fD\bin\java.exe"
+    goto execute
+  )
+)
 
 echo. 1>&2
-echo ERROR: JAVA_HOME is set to an invalid directory: %JAVA_HOME% 1>&2
+echo ERROR: Java 17 not found. 1>&2
 echo. 1>&2
-echo Please set the JAVA_HOME variable in your environment to match the 1>&2
-echo location of your Java installation. 1>&2
-
+echo Install JDK 17, or place it at "%APP_HOME%\.jdk". 1>&2
+echo Then run gradlew again. 1>&2
 goto fail
 
 :execute
